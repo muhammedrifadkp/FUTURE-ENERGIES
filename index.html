@@ -162,6 +162,11 @@ details.grp[open]>summary::after{content:"–"}
 .wr-row button{height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-size:12px;color:var(--ui-ink-2);padding:0}
 .wr-row button:hover{border-color:var(--danger);color:var(--danger)}
 .wr-head{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;font-size:11px;color:var(--muted);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{font:600 12px var(--sans);border:1px solid var(--line);background:#fff;color:var(--ui-ink-2);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip:hover{border-color:var(--navy);color:var(--navy)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 
 /* ---------- Preview ---------- */
 .preview{overflow:auto;padding:28px 24px 60px;min-width:0}
@@ -325,8 +330,8 @@ details.grp[open]>summary::after{content:"–"}
       <div class="grid2">
         <label class="fld"><span>Project ID</span><input data-k="projectId"></label>
         <label class="fld"><span>Date</span><input type="date" data-k="date"></label>
-        <label class="fld"><span>Prepared by</span><input data-k="preparedBy" data-hist="preparedBy"></label>
-        <label class="fld"><span>Project manager</span><input data-k="projectManager" data-hist="projectManager"></label>
+        <label class="fld full"><span>Prepared by</span><input data-k="preparedBy" data-hist="preparedBy"></label>
+        <div class="fld full"><label class="fld"><span>Project manager</span><input data-k="projectManager" data-hist="projectManager"></label><div class="chips" data-chips="projectManager" role="group" aria-label="Quick pick a project manager"></div></div>
         <label class="fld full"><span>Project name (leave empty to fill in from the system)</span><input data-k="projectName" data-hist="projectName"></label>
         <label class="fld"><span>Proposal valid (days)</span><input type="number" min="1" data-k="validDays"></label>
       </div>
@@ -335,7 +340,7 @@ details.grp[open]>summary::after{content:"–"}
     <details class="grp" open><summary>System</summary>
       <div class="grid2">
         <label class="fld"><span>System type</span>
-          <select data-k="systemType"><option>Hybrid</option><option>On-grid</option><option>Off-grid</option></select></label>
+          <select data-k="systemType"><option>Hybrid</option><option>On-grid</option></select></label>
         <label class="fld"><span>Capacity / inverter (kW)</span><input type="number" step="0.5" min="0" data-k="invKw"></label>
         <label class="fld"><span>Connection</span>
           <select data-k="phase"><option>Three phase</option><option>Single phase</option></select></label>
@@ -702,7 +707,7 @@ const HIST_STORE = 'fe-history-v1';
 const pad = n => String(n).padStart(2, '0');
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 
-const TYPES = ['Hybrid', 'On-grid', 'Off-grid'];
+const TYPES = ['Hybrid', 'On-grid']; // the system types Future Energies sells
 // Cleared by "New proposal" and never offered as suggestions; everything else is remembered on this device.
 const CUSTOMER_KEYS = ['custName', 'custAddress', 'custPhone', 'custEmail'];
 
@@ -759,8 +764,7 @@ const BOM_TAIL = [
 const DEFAULT_BOMS = {
   'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ROW('Hybrid DC DB', 'Finder / Mersen / LK', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
     { kind: 'battery' }, BATTERY_BOX, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL],
-  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL],
-  'Off-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'battery' }, BATTERY_BOX, ...BOM_TAIL]
+  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL]
 };
 const BOM_FIELDS = ['component', 'brand', 'spec', 'qty'];
 const nos = n => `${n} ${Number(n) === 1 ? 'No' : 'Nos'}`;
@@ -782,8 +786,11 @@ const normBom = (rows, type) => (Array.isArray(rows) ? rows : DEFAULT_BOMS[type]
 const normBoms = boms => Object.fromEntries(TYPES.map(t => [t, normBom(boms && boms[t], t)]));
 const bomCell = (r, a, f) => String(r[f]).trim() || (a[f] ?? '');
 
+// One-tap choices shown under a field
+const QUICK = { projectManager: ['Shamil', 'Jasir', 'Riyas'] };
 // Suggestions offered in the form (customer details are never collected here)
 const SUGGEST = {
+  projectManager: QUICK.projectManager,
   panelMake: ['Waaree', 'Adani', 'Vikram Solar', 'Tata Power', 'Premier Energies', 'RenewSys'],
   invMake: ['Waaree / Havells / Deye', 'Waaree', 'Havells', 'Deye', 'Solinteg'],
   batteryMake: ['Solinteg', 'Deye'],
@@ -956,6 +963,7 @@ function update() {
   $$('[data-type-label]').forEach(el => { el.textContent = state.systemType; });
   const ratio = v.dcKwp / (Number(state.invKw) || 1);
   bomPlaceholders(v);
+  renderChips();
   $('[data-hint="system"]').innerHTML = `Panel capacity <b>${esc(kw(v.dcKwp))} kWp</b> · DC/AC ratio ${ratio.toFixed(2)}<br>Project name: ${esc(v.projectNameT)}`;
   $('[data-hint="price"]').innerHTML = `GST ${inr(v.gst)} · <b>Total ${inr(v.total)}</b>` +
     (v.hasSubsidy ? `<br>Subsidy ${inr(v.subsidy)} · After subsidy ${inr(v.total - v.subsidy)}` : '') +
@@ -1122,6 +1130,21 @@ $('#bomAdd').addEventListener('click', () => {
   const rows = $$('#bomList .bom-row');
   rows[rows.length - 1].querySelector('[data-bf="component"]').focus();
 });
+// ---------- Quick picks (project manager) ----------
+function renderChips() {
+  $$('[data-chips]').forEach(box => {
+    const k = box.dataset.chips;
+    box.innerHTML = QUICK[k].map(name => `<button type="button" class="chip" data-pick="${esc(name)}" aria-pressed="${String(state[k]).trim() === name}">${esc(name)}</button>`).join('');
+  });
+}
+document.addEventListener('click', e => {
+  const chip = e.target.closest && e.target.closest('[data-pick]'); if (!chip) return;
+  const fld = $(`[data-k="${chip.closest('[data-chips]').dataset.chips}"]`);
+  fld.value = chip.dataset.pick;
+  fld.dispatchEvent(new Event('input', { bubbles: true }));
+  fld.dispatchEvent(new Event('change', { bubbles: true }));
+});
+
 // ---------- Warranty list ----------
 function renderWarrantyEditor() {
   $('#warrList').innerHTML = state.warranty.map((w, i) => `
