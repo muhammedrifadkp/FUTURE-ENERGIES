@@ -1,7 +1,7 @@
 // Offline support for the Future Energies Proposal Builder.
 // For every release raise VERSION here, APP_VERSION in index.html and version.json together;
 // installed apps then switch to the new version by themselves.
-const VERSION = '2026.10.21-7';
+const VERSION = '2026.10.22-1';
 const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
@@ -19,7 +19,7 @@ const FILES = [
   'assets/logo.png',
   'assets/photo.jpg',
   'assets/vendor/html2canvas.min.js',
-  ...['waaree.png', 'havells.svg', 'deye.png', 'adani.png', 'renewsys.png', 'vikram.png', 'tata-power.png', 'premier.png'].map(b => `assets/brands/${b}`),
+  ...['waaree.png', 'havells.png', 'deye.png', 'adani.png', 'renewsys.png', 'vikram.png', 'tata-power.png', 'premier.png'].map(b => `assets/brands/${b}`),
   ...ART.map(a => `assets/art/${a}.svg`),
   'icons/icon-192.png',
   'icons/icon-512.png',

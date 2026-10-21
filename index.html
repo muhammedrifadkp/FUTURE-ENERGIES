@@ -97,7 +97,7 @@ body.resizing .preview{pointer-events:none}
 .pdf-bar{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden;margin:4px 0 2px}
 .pdf-bar i{display:block;height:100%;width:0;background:var(--olive);transition:width .2s}
 /* the copy of the pages that is drawn into the PDF */
-.pdf-export .pages{zoom:1!important}
+.pdf-export .pages{transform:none!important}
 .pdf-export .page{box-shadow:none;background:transparent} /* the artwork is drawn underneath separately */
 .pdf-export [data-edit],.pdf-export [data-bind]{outline:none!important}
 /* html2canvas copies ::before/::after from the live page, so on-screen-only labels are switched off there while capturing */
@@ -195,7 +195,10 @@ details.grp[open]>summary::after{content:"–"}
 
 /* ---------- Preview ---------- */
 .preview{overflow:auto;padding:28px 24px 60px;min-width:0}
-.pages{display:flex;flex-direction:column;align-items:center;gap:22px;zoom:var(--z,1)}
+/* The preview is shrunk with transform, not zoom: with zoom, older iPhones (iOS 15) enlarge all small text
+   to their minimum text size and the pages fall apart. .pages-fit takes the shrunk size (set in fit()). */
+.pages-fit{margin:0 auto}
+.pages{display:flex;flex-direction:column;align-items:center;gap:22px;width:calc(210*var(--u));transform:scale(var(--z,1));transform-origin:0 0}
 .page{width:calc(210*var(--u));height:calc(297*var(--u));background:#fff;box-shadow:0 2px 14px rgba(15,25,50,.15);position:relative;overflow:hidden;flex:none;font-family:var(--sans);color:var(--ink);line-height:1.2}
 .page.overflow::after{content:"Content too long for this page — shorten text";position:absolute;top:calc(8*var(--pt));left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font:600 calc(9*var(--pt)) var(--sans);padding:calc(5*var(--pt)) calc(10*var(--pt));border-radius:calc(5*var(--pt));z-index:5;white-space:nowrap}
 .page h1,.page h2,.page p,.page ul{margin:0;padding:0;font-weight:400}
@@ -260,7 +263,7 @@ details.grp[open]>summary::after{content:"–"}
 /* keep the first lines clear of the plant stem drawn on the right */
 .tc-list li:nth-child(1)>div{max-width:calc(172*var(--pt))}
 .tc-list li:nth-child(2)>div{max-width:calc(184*var(--pt))}
-.amc-list li{grid-template-columns:calc(25*var(--pt)) 1fr;margin-bottom:calc(18*var(--pt))}
+.amc-list li{grid-template-columns:calc(25*var(--pt)) 1fr;margin-bottom:calc(15*var(--pt))}
 .amc-list li:last-child{margin-bottom:0}
 .amc-list li>div{padding-top:calc(4*var(--pt))}
 /* warranty band: one row for up to 3 items, then a 2- or 3-column grid in two rows */
@@ -305,7 +308,8 @@ details.grp[open]>summary::after{content:"–"}
   html,body{background:#fff;height:auto;overflow:visible;display:block;padding:0!important;margin:0!important}
   .editor,.mobile-bar,.top-install-btn,.install-modal-backdrop,.update-bar{display:none!important}
   .preview{padding:0;overflow:visible}
-  .pages{zoom:1!important;gap:0;display:block}
+  .pages-fit{width:auto!important;height:auto!important}
+  .pages{transform:none!important;width:auto;gap:0;display:block}
   .page{box-shadow:none;margin:0 auto;break-after:page;page-break-after:always}
   .page:last-child{break-after:auto;page-break-after:auto}
   .page.overflow::after{display:none}
@@ -500,6 +504,7 @@ details.grp[open]>summary::after{content:"–"}
 
 <!-- =================== PROPOSAL =================== -->
 <main class="preview" id="preview">
+<div class="pages-fit" id="pagesFit">
 <div class="pages" id="pages">
 
 <!-- ========== 1. COVER ========== -->
@@ -542,7 +547,7 @@ details.grp[open]>summary::after{content:"–"}
   <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, Future Energies partners with India’s most<br>trusted and reputed solar brands</p>
   <div class="a brands" style="--x:63;--y:619;--w:468">
     <div class="brand" data-show="brand_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
-    <div class="brand" data-show="brand_havells"><img src="assets/brands/havells.svg" alt="Havells" style="width:calc(82*var(--pt))"></div>
+    <div class="brand" data-show="brand_havells"><img src="assets/brands/havells.png" alt="Havells" style="width:calc(82*var(--pt))"></div>
     <div class="brand" data-show="brand_deye"><img src="assets/brands/deye.png" alt="Deye" style="width:calc(66*var(--pt))"></div>
     <div class="brand" data-show="brand_adani"><img src="assets/brands/adani.png" alt="Adani Solar" style="width:calc(49*var(--pt))"></div>
     <div class="brand" data-show="brand_renewsys"><img src="assets/brands/renewsys.png" alt="RenewSys" style="width:calc(64*var(--pt))"></div>
@@ -677,7 +682,7 @@ details.grp[open]>summary::after{content:"–"}
 
   <div class="t serif olive b6" style="--x:279;--y:446;--fs:12.8">AMC</div>
   <div class="tl white" style="--x:277;--y:538;--fs:7.9;--lh:19;--w:68;text-align:center">Free <span data-f="amcYears"></span>-Year<br>Maintenance<br>for Your<br>Solar System</div>
-  <ul class="a ilist amc-list" style="--x:353;--y:451;--w:205" data-edit="amc" contenteditable="true" spellcheck="false" data-max="646">
+  <ul class="a ilist amc-list" style="--x:353;--y:451;--w:212" data-edit="amc" contenteditable="true" spellcheck="false" data-max="646">
     <li><img contenteditable="false" src="assets/art/ic-amc-check.svg" alt="" style="width:calc(21*var(--pt))"><div>Annual Check-Up: We’ll visit your solar system once a year.</div></li>
     <li><img contenteditable="false" src="assets/art/ic-amc-shield2.svg" alt="" style="width:calc(21*var(--pt))"><div>Warranty Assistance: We’re here to help with warranty claims.</div></li>
     <li><img contenteditable="false" src="assets/art/ic-amc-search.svg" alt="" style="width:calc(23*var(--pt))"><div>What We Check: During our visit, we’ll inspect electrical components, connections, and the inverter, ensuring everything works efficiently.</div></li>
@@ -756,6 +761,7 @@ details.grp[open]>summary::after{content:"–"}
   <div class="pnum">PROPOSAL / 06</div>
 </section>
 
+</div>
 </div>
 </main>
 
@@ -1398,7 +1404,11 @@ $('#bomReset').addEventListener('click', () => {
 function fit() {
   const avail = $('#preview').clientWidth - 48;
   const pagePx = 210 * 96 / 25.4;
-  document.documentElement.style.setProperty('--z', Math.min(1, avail / pagePx).toFixed(3));
+  const z = Number(Math.min(1, avail / pagePx).toFixed(3));
+  document.documentElement.style.setProperty('--z', z);
+  // transform doesn't change the layout size, so the wrapper is given the shrunk size
+  $('#pagesFit').style.width = `${pagePx * z}px`;
+  $('#pagesFit').style.height = `${$('#pages').offsetHeight * z}px`;
 }
 window.addEventListener('resize', () => { setSide(sideW); update(); });
 
@@ -1572,6 +1582,7 @@ async function buildPdf(onProgress) {
     ctx.drawImage(top, 0, 0, W, H);
     top.width = top.height = 0;
     const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', PDF_QUALITY));
+    if (!jpeg || jpeg.type !== 'image/jpeg') throw new Error('no-jpeg'); // a browser without JPEG output would make a broken PDF
     images.push({ bytes: new Uint8Array(await jpeg.arrayBuffer()), w: W, h: H });
     canvas.width = canvas.height = 0; // free the memory straight away on phones
   }
@@ -1624,7 +1635,10 @@ $('#btnPdf').addEventListener('click', async () => {
       catch (err) { if (err && err.name !== 'AbortError') downloadBlob(blob, name); }
     });
   } catch (err) {
-    pdfDialog('<h3 id="pdfTitle">Couldn’t create the PDF</h3><p>Please try again. If it keeps failing, reload the app.</p><div class="btns"><button class="btn primary" type="button" id="pdfClose">Close</button></div>');
+    const why = err && err.message === 'no-jpeg'
+      ? 'This browser can’t make the PDF images. Please update the phone’s software, or use Chrome or Safari on another device.'
+      : 'Please try again. If it keeps failing, reload the app.';
+    pdfDialog(`<h3 id="pdfTitle">Couldn’t create the PDF</h3><p>${why}</p><div class="btns"><button class="btn primary" type="button" id="pdfClose">Close</button></div>`);
     $('#pdfClose').addEventListener('click', () => { $('#pdfModal').style.display = 'none'; });
   } finally {
     document.documentElement.classList.remove('pdf-capturing');
@@ -1802,7 +1816,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.21-7';
+const APP_VERSION = '2026.10.22-1';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;
