@@ -8,4 +8,4 @@ Installable as an app (PWA) and works offline once loaded.
 - Open `index.html` locally, or deploy this folder to Vercel (no build step).
 - Everything except the customer details is remembered in the browser on each device. **New proposal** clears only the customer details and raises the project ID by one.
 - Artwork in `assets/art/` was exported from the sample PDF; `assets/photo.jpg` and `assets/brands/` too.
-- After changing files, raise the cache version in `sw.js` so installed apps update.
+- **Releasing an update:** raise the version in three places together: `APP_VERSION` in `index.html`, `VERSION` in `sw.js` and `version.json` (format `YYYY.MM.DD-n`). Installed apps check `version.json` when they are reopened and every 30 minutes. When the app comes back from the background they switch to the new version by themselves; while someone is typing they show an "Update" bar instead. Details are saved on the device, so the reload loses nothing.

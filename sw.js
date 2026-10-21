@@ -1,6 +1,8 @@
 // Offline support for the Future Energies Proposal Builder.
-// After you change any file and redeploy, raise the version number so phones pick up the update.
-const CACHE = 'fe-proposals-v6';
+// For every release raise VERSION here, APP_VERSION in index.html and version.json together;
+// installed apps then switch to the new version by themselves.
+const VERSION = '2026.10.21-7';
+const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
   'p1-deco', 'p1-tri', 'p1-stats', 'p2-deco', 'p3-top', 'p3-bottom', 'p4-leaf', 'p4-panel', 'p5-sprig', 'p6-right', 'p6-dot', 'p6-bottom',
@@ -30,7 +32,8 @@ const FILES = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));
+  // 'reload' skips the browser's own cache, so a new release stores only new files
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
@@ -43,7 +46,9 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith('/version.json')) return; // always from the server: it tells the app about updates
 
   // The page itself: use the latest version when online, the saved copy when offline.
   if (req.mode === 'navigate') {
