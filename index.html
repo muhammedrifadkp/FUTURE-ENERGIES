@@ -171,17 +171,18 @@ details.grp[open]>summary::after{content:"–"}
 .bom-grid input::placeholder{color:#98A1B0}
 .bom-grid input:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .bom-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pkg-box{grid-column:1/-1;background:var(--navy-50);border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.45;color:var(--ui-ink-2)}
+.pkg-box p{margin:0}
+.pkg-bar{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0 6px}
+.btn.sm{padding:6px 9px;font-size:11.5px}
+.pkg-links a{color:var(--navy)}
 .wr-row{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;align-items:center;margin-bottom:6px}
 .wr-row input{font:400 12.5px var(--sans);color:var(--ui-ink);border:1px solid var(--line);border-radius:6px;padding:6px 7px;min-width:0;width:100%;background:#fff}
 .wr-row input:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .wr-row button{height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-size:12px;color:var(--ui-ink-2);padding:0}
 .wr-row button:hover{border-color:var(--danger);color:var(--danger)}
 .wr-head{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;font-size:11px;color:var(--muted);margin-bottom:4px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.chip{font:600 12px var(--sans);border:1px solid var(--line);background:#fff;color:var(--ui-ink-2);border-radius:999px;padding:6px 12px;cursor:pointer}
-.chip:hover{border-color:var(--navy);color:var(--navy)}
-.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-.chip:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.fld[hidden]{display:none}
 
 /* ---------- Preview ---------- */
 .preview{overflow:auto;padding:28px 24px 60px;min-width:0}
@@ -241,8 +242,6 @@ details.grp[open]>summary::after{content:"–"}
 .oline{border-top:1px solid #CBCBCD;margin:calc(1*var(--pt)) calc(-10*var(--pt)) calc(12*var(--pt)) calc(-5*var(--pt))}
 .ototal{display:flex;justify-content:space-between;align-items:center;background:var(--navy-x);color:#fff;border-radius:calc(11.5*var(--pt));height:calc(23*var(--pt));padding:0 calc(14*var(--pt)) 0 calc(17*var(--pt));margin:0 calc(-21*var(--pt)) 0 calc(-5*var(--pt));font-size:calc(10*var(--pt))}
 .ototal b{font-weight:700;font-size:calc(11.5*var(--pt))}
-.osub{display:flex;justify-content:space-between;font-size:calc(7.6*var(--pt));color:var(--navy-x);margin-top:calc(5*var(--pt));line-height:1.3}
-.osub b{font-weight:600}
 
 /* 5. terms */
 .ilist li{display:grid;align-items:start;font-size:calc(7.9*var(--pt));line-height:calc(11*var(--pt))}
@@ -268,6 +267,12 @@ details.grp[open]>summary::after{content:"–"}
 .crow{display:grid;grid-template-columns:calc(26*var(--pt)) 1fr;column-gap:calc(9*var(--pt));align-items:start;font-size:calc(11.5*var(--pt));line-height:calc(18*var(--pt));margin-bottom:calc(7*var(--pt));overflow-wrap:break-word}
 .crow:last-child{margin-bottom:0}
 .crow img{display:block;margin-top:calc(1*var(--pt))}
+/* customer acceptance and signature box at the bottom of page 6 */
+.sign{display:grid;grid-template-columns:1fr 1fr;column-gap:calc(26*var(--pt));border:calc(.75*var(--pt)) solid #CFD0D3;border-radius:calc(12*var(--pt));padding:calc(9*var(--pt)) calc(18*var(--pt)) calc(7*var(--pt))}
+.sign h4{margin:0 0 calc(2*var(--pt));font:600 calc(11*var(--pt))/1.2 var(--serif);color:var(--olive)}
+.sign p{margin:0;font-size:calc(7.8*var(--pt));line-height:1.2;color:var(--grey)}
+.sig-line{border-top:calc(.75*var(--pt)) solid #3C4A42;margin-top:calc(20*var(--pt));padding-top:calc(2*var(--pt));font-size:calc(7.4*var(--pt));line-height:1.2;color:var(--grey)}
+.sig-line+.sig-line{margin-top:calc(17*var(--pt))}
 
 /* ---------- Responsive & print ---------- */
 .mobile-bar{display:none}
@@ -348,7 +353,8 @@ details.grp[open]>summary::after{content:"–"}
         <label class="fld"><span>Project ID</span><input data-k="projectId"></label>
         <label class="fld"><span>Date</span><input type="date" data-k="date"></label>
         <label class="fld full"><span>Prepared by</span><input data-k="preparedBy" data-hist="preparedBy"></label>
-        <div class="fld full"><label class="fld"><span>Project manager</span><input data-k="projectManager" data-hist="projectManager"></label><div class="chips" data-chips="projectManager" role="group" aria-label="Quick pick a project manager"></div></div>
+        <label class="fld"><span>Project manager</span><select id="pmSelect"></select></label>
+        <label class="fld" id="pmOtherWrap" hidden><span>Project manager name</span><input data-k="projectManager" data-hist="projectManager" placeholder="Type the name"></label>
         <label class="fld full"><span>Project name (leave empty to fill in from the system)</span><input data-k="projectName" data-hist="projectName"></label>
         <label class="fld"><span>Proposal valid (days)</span><input type="number" min="1" data-k="validDays"></label>
       </div>
@@ -358,6 +364,18 @@ details.grp[open]>summary::after{content:"–"}
       <div class="grid2">
         <label class="fld"><span>System type</span>
           <select data-k="systemType"><option>Hybrid</option><option>On-grid</option></select></label>
+        <label class="fld"><span>Package (kW)</span><select id="pkgSelect" aria-describedby="pkgStatus"></select></label>
+        <div class="pkg-box">
+          <p id="pkgStatus"></p>
+          <div class="pkg-bar">
+            <button class="btn sm" type="button" id="pkgRefill" hidden>Fill again</button>
+            <button class="btn sm primary" type="button" id="pkgSave">Save as package</button>
+            <button class="btn sm" type="button" id="pkgNew">+ New package</button>
+            <button class="btn sm" type="button" id="pkgDelete">Delete package</button>
+          </div>
+          <p class="pkg-links"><a href="#" id="pkgExport">Save packages file</a> · <a href="#" id="pkgImport">Open packages file</a> · <a href="#" id="pkgRestore">Restore demo packages</a></p>
+          <input type="file" id="pkgFile" accept=".json,application/json" hidden>
+        </div>
         <label class="fld"><span>Capacity / inverter (kW)</span><input type="number" step="0.5" min="0" data-k="invKw"></label>
         <label class="fld"><span>Connection</span>
           <select data-k="phase"><option>Three phase</option><option>Single phase</option></select></label>
@@ -377,7 +395,7 @@ details.grp[open]>summary::after{content:"–"}
 
     <details class="grp" id="bomGroup"><summary>Bill of materials</summary>
       <div class="bom-ed">
-        <p class="bom-note">This is the list for <b data-type-label></b> systems; changes are remembered for that system type. Green rows fill in from the System section; grey text is the automatic value, and typing over it replaces it.</p>
+        <p class="bom-note">Choosing a package in the System section fills this list. Changes here are for this proposal; <b>Save as package</b> keeps them for next time. Green rows fill in from the System section; grey text is the automatic value, and typing over it replaces it.</p>
         <div id="bomList"></div>
         <div class="bom-actions">
           <button class="btn primary" type="button" id="bomAdd">+ Add item</button>
@@ -388,10 +406,9 @@ details.grp[open]>summary::after{content:"–"}
 
     <details class="grp" open><summary>Commercial offer</summary>
       <div class="grid2">
-        <label class="fld full"><span>System cost, before GST (₹)</span><input type="number" step="500" min="0" data-k="systemCost"></label>
-        <label class="fld"><span>GST rate (%)</span><input type="number" step="0.1" min="0" data-k="gstPct"></label>
+        <label class="fld full"><span>Total project cost, inclusive of all taxes (₹)</span><input type="number" step="500" min="0" data-k="systemCost"></label>
         <label class="fld"><span>Subsidy</span>
-          <select data-k="subsidyMode"><option value="none">No subsidy</option><option value="auto">PM Surya Ghar (auto)</option><option value="custom">Custom amount</option></select></label>
+          <select data-k="subsidyMode"><option value="auto">PM Surya Ghar (auto)</option><option value="custom">Custom amount</option><option value="none">No subsidy</option></select></label>
         <label class="fld" data-when="subsidyMode=custom"><span>Subsidy amount (₹)</span><input type="number" step="1000" min="0" data-k="subsidyCustom"></label>
         <div class="hint" data-hint="price"></div>
       </div>
@@ -447,6 +464,7 @@ details.grp[open]>summary::after{content:"–"}
 
     <details class="grp"><summary>Company &amp; bank details</summary>
       <div class="grid2">
+        <label class="fld chk full"><input type="checkbox" data-k="showSign">Customer acceptance &amp; signature box at the bottom of page 6</label>
         <label class="fld"><span>Phone 1</span><input data-k="coPhone1"></label>
         <label class="fld"><span>Phone 2</span><input data-k="coPhone2"></label>
         <label class="fld"><span>Email</span><input data-k="coEmail"></label>
@@ -587,11 +605,11 @@ details.grp[open]>summary::after{content:"–"}
   </div>
   <div class="ab offer" style="--x:38;--b:131.89;--w:435">
     <div class="offer-title">COMMERCIAL OFFER</div>
-    <div class="orow"><span>System Cost (Before GST)</span><b data-f="costT"></b></div>
-    <div class="orow"><span data-f="gstLabel"></span><b data-f="gstT"></b></div>
+    <div class="orow" data-show="hasSubsidy"><span>Total Project Cost (inclusive of all taxes)</span><b data-f="totalT"></b></div>
+    <div class="orow" data-show="hasSubsidy"><span><span data-f="subsidyLabel"></span> (credited to your bank account)</span><b data-f="subsidyMinusT"></b></div>
+    <div class="orow" data-show="noSubsidy"><span>Price inclusive of all taxes</span></div>
     <div class="oline"></div>
-    <div class="ototal"><span>TOTAL PROJECT COST</span><b data-f="totalT"></b></div>
-    <div class="osub" data-show="hasSubsidy"><span>Less: <span data-f="subsidyLabel"></span> (credited to your bank account) <b data-f="subsidyT"></b></span><span>Net cost after subsidy <b data-f="netCostT"></b></span></div>
+    <div class="ototal"><span data-f="netLabel"></span><b data-f="netCostT"></b></div>
   </div>
   <div class="tl" style="--x:111;--y:742;--fs:7.9;--lh:12;--w:80">High Efficiency<br>Panels</div>
   <div class="tl" style="--x:274;--y:742;--fs:7.9;--lh:12;--w:80">Smart Energy<br>Monitoring</div>
@@ -670,7 +688,7 @@ details.grp[open]>summary::after{content:"–"}
     <line x1="41" y1="143.7" x2="68" y2="143.7" stroke="#98C93E" stroke-width="2"/>
     <image href="assets/art/p6-right.svg" x="470" y="110" width="125.3" height="455"/>
     <image href="assets/art/p6-dot.svg" x="343" y="556" width="35" height="36"/>
-    <image href="assets/art/p6-bottom.svg" x="45" y="655" width="505" height="140"/>
+    <image href="assets/art/p6-bottom.svg" x="45" y="655" width="505" height="140" data-show="noSign"/>
     <line x1="328" y1="221.7" x2="511" y2="221.7" stroke="#72923C" stroke-width=".75"/>
   </svg>
   <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:35">
@@ -690,7 +708,7 @@ details.grp[open]>summary::after{content:"–"}
     <div data-show="hasUpi">UPI ID : <span data-f="bankUpi"></span></div>
   </div>
 
-  <div class="a ccard" style="--x:42;--y:403;--w:254" data-max="702">
+  <div class="a ccard" style="--x:42;--y:403;--w:254" data-max="702" data-max-sign="680">
     <div class="ct">Future Energies</div>
     <div class="csep"></div>
     <div class="crow"><img src="assets/art/ic-pin.svg" alt="" style="width:calc(22*var(--pt))"><div class="pre" data-f="coAddress"></div></div>
@@ -704,6 +722,21 @@ details.grp[open]>summary::after{content:"–"}
   <img class="a" src="assets/art/ic-phone-big.svg" alt="" style="--x:62;--y:385;--w:40">
   <div class="a" style="--x:130;--y:393;--w:107;height:calc(32*var(--pt));background:#222121"></div>
   <div class="t white tc" style="--x:183.5;--y:409;--fs:13.8">Contact Us</div>
+  <!-- replaces the line drawing at the bottom when shown -->
+  <div class="a sign" style="--x:42;--y:684;--w:511" data-show="showSign" data-max="790">
+    <div>
+      <h4 data-edit="signHead1" data-oneline contenteditable="true" spellcheck="false">Customer acceptance</h4>
+      <p data-edit="signText1" data-oneline contenteditable="true" spellcheck="false">I / We accept this proposal and its terms.</p>
+      <div class="sig-line">Signature</div>
+      <div class="sig-line">Name &amp; date</div>
+    </div>
+    <div>
+      <h4 data-edit="signHead2" data-oneline contenteditable="true" spellcheck="false">For Future Energies</h4>
+      <p data-edit="signText2" data-oneline contenteditable="true" spellcheck="false">Authorised signatory</p>
+      <div class="sig-line">Signature &amp; seal</div>
+      <div class="sig-line">Name &amp; date</div>
+    </div>
+  </div>
   <div class="pnum">PROPOSAL / 06</div>
 </section>
 
@@ -739,13 +772,13 @@ const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
 const BRAND_KEYS = ['brand_waaree', 'brand_havells', 'brand_deye', 'brand_adani', 'brand_renewsys', 'brand_vikram', 'brand_tata', 'brand_premier'];
 
 const DEFAULTS = {
-  v: 2,
+  v: 3,
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000', custEmail: '',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
   panelMake: 'Waaree', panelWatt: 620, panelCount: 16, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)',
   batteryMake: 'Solinteg', batteryCount: 3, batterySpec: '102.4V, 50AH',
-  systemCost: 600000, gstPct: 8.9, subsidyMode: 'none', subsidyCustom: 78000,
+  systemCost: 600000, subsidyMode: 'auto', subsidyCustom: 78000, // cost is inclusive of all taxes
   pay1Pct: 50, pay1a: 'upfront', pay1b: 'when you agree to start',
   pay2Pct: 30, pay2a: 'after we deliver', pay2b: 'the solar equipment',
   pay3Pct: 20, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
@@ -755,6 +788,8 @@ const DEFAULTS = {
   statSavings: '70-100%', statProjects: '100+',
   brand_waaree: true, brand_havells: true, brand_deye: true,
   brand_adani: false, brand_renewsys: false, brand_vikram: false, brand_tata: false, brand_premier: false,
+  showSign: true,
+  packageId: '',
   coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
   coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
   gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
@@ -802,11 +837,81 @@ const normBom = (rows, type) => (Array.isArray(rows) ? rows : DEFAULT_BOMS[type]
 const normBoms = boms => Object.fromEntries(TYPES.map(t => [t, normBom(boms && boms[t], t)]));
 const bomCell = (r, a, f) => String(r[f]).trim() || (a[f] ?? '');
 
-// One-tap choices shown under a field
-const QUICK = { projectManager: ['Shamil', 'Jasir', 'Riyas'] };
+// ---------- kW packages: choosing one fills the system, bill of materials and price ----------
+// Demo packages until Future Energies sends the real ones; packages saved in the app stay on this device.
+const PKG_STORE = 'fe-packages-v1';
+const PACKAGE_KEYS = ['invKw', 'phase', 'invMake', 'panelMake', 'panelWatt', 'panelCount', 'panelTech', 'batteryMake', 'batteryCount', 'batterySpec', 'systemCost'];
+const DEMO_SIZES = {
+  3: { phase: 'Single phase', panelCount: 5, batteryCount: 1, price: { 'Hybrid': 310000, 'On-grid': 195000 } },
+  5: { phase: 'Single phase', panelCount: 8, batteryCount: 2, price: { 'Hybrid': 460000, 'On-grid': 310000 } },
+  10: { phase: 'Three phase', panelCount: 16, batteryCount: 3, price: { 'Hybrid': 840000, 'On-grid': 590000 } }
+};
+const DEFAULT_PACKAGE = 'Hybrid-10'; // what a new device starts with (the sample proposal)
+const pkgId = p => `${p.type}-${p.kw}`;
+const pickPkg = src => Object.fromEntries(PACKAGE_KEYS.filter(k => src[k] !== undefined).map(k => [k, src[k]]));
+const clone = x => JSON.parse(JSON.stringify(x));
+function demoBom(type, size) {
+  const big = size >= 10;
+  return normBom(DEFAULT_BOMS[type], type).map(r =>
+    r.component === 'AC Cable' ? { ...r, spec: big ? '6 sq.mm' : '4 sq.mm' } :
+    /DC DB$/.test(r.component) ? { ...r, spec: `${big ? '2 In 2 Out' : '1 In 1 Out'}, IP65, SPD Protection` } : r);
+}
+function demoPackages() {
+  const common = { invMake: 'Waaree / Havells / Deye', panelMake: 'Waaree', panelWatt: 620, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)', batteryMake: 'Solinteg', batterySpec: '102.4V, 50AH' };
+  return TYPES.flatMap(type => Object.entries(DEMO_SIZES).map(([size, d]) => ({
+    type, kw: Number(size),
+    values: { ...common, invKw: Number(size), phase: d.phase, panelCount: d.panelCount, batteryCount: d.batteryCount, systemCost: d.price[type] },
+    bom: demoBom(type, Number(size))
+  })));
+}
+const normPackage = p => p && TYPES.includes(p.type) && Number(p.kw) > 0
+  ? { type: p.type, kw: Number(p.kw), values: pickPkg(p.values || {}), bom: normBom(p.bom, p.type) } : null;
+const sortPackages = list => list.sort((a, b) => a.type.localeCompare(b.type) || a.kw - b.kw);
+let packages = [];
+function loadPackages() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(PKG_STORE) || 'null'); } catch (e) { /* storage unavailable */ }
+  packages = sortPackages(Array.isArray(saved) ? saved.map(normPackage).filter(Boolean) : demoPackages());
+}
+function savePackages() {
+  try { localStorage.setItem(PKG_STORE, JSON.stringify(packages)); } catch (e) { /* ignore */ }
+}
+const currentPackage = () => packages.find(p => pkgId(p) === state.packageId && p.type === state.systemType);
+function fillFromPackage(p) {
+  Object.assign(state, clone(p.values));
+  state.boms[p.type] = normBom(p.bom, p.type);
+  state.packageId = pkgId(p);
+}
+function applyPackage(p) { fillFromPackage(p); fillForm(); renderBomEditor(); update(); save(); }
+const packageChanged = p => PACKAGE_KEYS.some(k => p.values[k] !== undefined && String(state[k] ?? '') !== String(p.values[k])) ||
+  JSON.stringify(bom()) !== JSON.stringify(normBom(p.bom, p.type));
+let pkgOptions = '';
+function renderPackages() {
+  const sel = $('#pkgSelect');
+  const html = packages.filter(p => p.type === state.systemType).map(p => `<option value="${esc(pkgId(p))}">${esc(kw(p.kw))} kW</option>`).join('') + '<option value="">Custom</option>';
+  if (html !== pkgOptions) { sel.innerHTML = html; pkgOptions = html; } // only when the list changes, so an open dropdown isn't reset
+  const p = currentPackage();
+  sel.value = p ? pkgId(p) : '';
+  const changed = !!p && packageChanged(p);
+  const name = p ? `<b>${esc(kw(p.kw))} kW ${esc(p.type)}</b>` : '';
+  $('#pkgRefill').hidden = !changed;
+  $('#pkgDelete').hidden = !p;
+  $('#pkgStatus').innerHTML = !p ? 'Custom: fill in the system yourself. <b>Save as package</b> keeps it as a new kW package.'
+    : changed ? `Changed after filling from the ${name} package. <b>Save as package</b> keeps the changes for next time; <b>Fill again</b> goes back to the package.`
+    : `Filled from the ${name} package: system, bill of materials and price.`;
+}
+function storeCurrentAs(size) {
+  const p = normPackage({ type: state.systemType, kw: size, values: pickPkg(state), bom: bom() });
+  packages = sortPackages([...packages.filter(x => pkgId(x) !== pkgId(p)), p]);
+  savePackages();
+  state.packageId = pkgId(p);
+  update(); save();
+}
+
+// Project managers in the dropdown; "Other" lets any name be typed
+const MANAGERS = ['Shamil', 'Jasir', 'Riyas'];
 // Suggestions offered in the form (customer details are never collected here)
 const SUGGEST = {
-  projectManager: QUICK.projectManager,
   panelMake: ['Waaree', 'Adani', 'Vikram Solar', 'Tata Power', 'Premier Energies', 'RenewSys'],
   invMake: ['Waaree / Havells / Deye', 'Waaree', 'Havells', 'Deye', 'Solinteg'],
   batteryMake: ['Solinteg', 'Deye'],
@@ -848,6 +953,12 @@ function migrate(saved) {
     }
     ['panelWarranty', 'invWarranty', 'batteryWarranty'].forEach(k => { delete s[k]; });
   }
+  if ((Number(s.v) || 1) < 3) {
+    // GST removed: the saved cost was before GST, so keep the same total by adding the GST that was set
+    if (s.gstPct !== undefined && s.systemCost !== undefined && s.systemCost !== '') s.systemCost = Math.round(Number(s.systemCost) * (1 + (Number(s.gstPct) || 0) / 100));
+    delete s.gstPct;
+    if (s.subsidyMode === 'none') s.subsidyMode = 'auto'; // the old default; subsidy is now worked out as in Zairo
+  }
   s.v = DEFAULTS.v;
   return s;
 }
@@ -860,11 +971,13 @@ function fromSaved(saved) {
 }
 
 function load() {
+  let found = false;
   try {
     const saved = JSON.parse(localStorage.getItem(STORE) || 'null');
-    if (saved && saved.state) { state = fromSaved(saved.state); edits = saved.edits || {}; }
+    if (saved && saved.state) { state = fromSaved(saved.state); edits = saved.edits || {}; found = true; }
   } catch (e) { /* storage unavailable: run with defaults */ }
   try { hist = JSON.parse(localStorage.getItem(HIST_STORE) || '{}') || {}; } catch (e) { hist = {}; }
+  return found;
 }
 function save() {
   try { localStorage.setItem(STORE, JSON.stringify({ state, edits })); } catch (e) { /* ignore */ }
@@ -874,6 +987,7 @@ function save() {
 function remember(key, value) {
   const v = String(value ?? '').trim();
   if (!v || v.length > 120) return;
+  if (key === 'projectManager' && MANAGERS.includes(v)) return; // already in the dropdown
   hist[key] = [v, ...(hist[key] || []).filter(x => x !== v)].slice(0, 15);
   try { localStorage.setItem(HIST_STORE, JSON.stringify(hist)); } catch (e) { /* ignore */ }
   fillDatalist(key);
@@ -904,21 +1018,19 @@ function derive(s) {
   const pw = s.warranty.find(w => w.kind === 'panel') || s.warranty[0];
   v.panelWarranty = pw ? pw.years.trim() : '';
 
-  // Commercial offer
-  v.cost = Math.round(n('systemCost'));
-  v.gst = Math.round(v.cost * n('gstPct') / 100);
-  v.total = v.cost + v.gst;
-  v.costT = money(v.cost); v.gstT = money(v.gst); v.totalT = money(v.total);
-  v.gstLabel = `GST (${Math.round(n('gstPct') * 100) / 100}%)`;
+  // Commercial offer: one price inclusive of all taxes, less the subsidy (as in the Zairo quotation)
+  v.total = Math.round(n('systemCost'));
   let sub = 0;
   if (s.subsidyMode === 'auto') {
     // PM Surya Ghar: ₹30,000/kW up to 2 kW, ₹18,000 for the 3rd kW, capped at ₹78,000
     const c = v.dcKwp;
     sub = Math.min(78000, Math.round(Math.min(c, 2) * 30000 + Math.max(0, Math.min(c, 3) - 2) * 18000));
   } else if (s.subsidyMode === 'custom') sub = n('subsidyCustom');
-  v.subsidy = sub; v.hasSubsidy = sub > 0;
-  v.subsidyLabel = s.subsidyMode === 'auto' ? 'PM Surya Ghar subsidy' : 'Subsidy';
-  v.subsidyT = money(sub); v.netCostT = money(v.total - sub);
+  v.subsidy = sub; v.hasSubsidy = sub > 0; v.noSubsidy = !v.hasSubsidy;
+  v.subsidyLabel = s.subsidyMode === 'auto' ? 'Less: PM Surya Ghar Subsidy' : 'Less: Subsidy';
+  v.netCost = v.total - sub;
+  v.totalT = money(v.total); v.subsidyMinusT = '− ' + money(sub); v.netCostT = money(v.netCost);
+  v.netLabel = v.hasSubsidy ? 'COST AFTER SUBSIDY' : 'TOTAL PROJECT COST';
 
   // Payment terms
   [1, 2, 3].forEach(i => { v[`pay${i}On`] = n(`pay${i}Pct`) > 0; });
@@ -943,6 +1055,7 @@ function derive(s) {
   v.hasCoInsta = !!insta;
   v.hasAccName = !!String(s.bankAccName).trim();
   v.hasUpi = !!String(s.bankUpi).trim();
+  v.noSign = !s.showSign;
   return v;
 }
 
@@ -979,11 +1092,11 @@ function update() {
   $$('[data-type-label]').forEach(el => { el.textContent = state.systemType; });
   const ratio = v.dcKwp / (Number(state.invKw) || 1);
   bomPlaceholders(v);
-  renderChips();
+  syncManager();
+  renderPackages();
   $('[data-hint="system"]').innerHTML = `Panel capacity <b>${esc(kw(v.dcKwp))} kWp</b> · DC/AC ratio ${ratio.toFixed(2)}<br>Project name: ${esc(v.projectNameT)}`;
-  $('[data-hint="price"]').innerHTML = `GST ${inr(v.gst)} · <b>Total ${inr(v.total)}</b>` +
-    (v.hasSubsidy ? `<br>Subsidy ${inr(v.subsidy)} · After subsidy ${inr(v.total - v.subsidy)}` : '') +
-    (v.dcKwp ? `<br>${inr(v.total / v.dcKwp)} per kWp including GST` : '');
+  $('[data-hint="price"]').innerHTML = (v.hasSubsidy ? `Subsidy ${inr(v.subsidy)} · <b>After subsidy ${inr(v.netCost)}</b>` : `<b>Total ${inr(v.total)}</b> (no subsidy)`) +
+    (v.dcKwp ? `<br>${inr(v.total / v.dcKwp)} per kWp · panel capacity ${esc(kw(v.dcKwp))} kWp` : '');
   const amt = i => inr(v.total * (Number(state[`pay${i}Pct`]) || 0) / 100);
   $('[data-hint="pay"]').innerHTML = `Step 1 ${amt(1)} · Step 2 ${amt(2)} · Step 3 ${amt(3)}<br>Total ${v.paySum}%`;
 
@@ -1010,7 +1123,10 @@ function checkFit() {
     const bottom = el => (el.getBoundingClientRect().bottom - pr.top) * k;
     const right = el => (el.getBoundingClientRect().right - pr.left) * k;
     let bad = false;
-    pg.querySelectorAll('[data-max]').forEach(el => { if (el.getClientRects().length && bottom(el) > Number(el.dataset.max) + .5) bad = true; });
+    pg.querySelectorAll('[data-max]').forEach(el => {
+      const max = Number(state.showSign && el.dataset.maxSign ? el.dataset.maxSign : el.dataset.max); // less room when the signature box is shown
+      if (el.getClientRects().length && bottom(el) > max + .5) bad = true;
+    });
     pg.querySelectorAll('[data-maxx]').forEach(el => { if (el.getClientRects().length && right(el) > Number(el.dataset.maxx) + .5) bad = true; });
     const tbl = pg.querySelector('.bomwrap'), offer = pg.querySelector('.offer');
     if (tbl && offer) {
@@ -1070,7 +1186,14 @@ function onField(e) {
   if (!el.dataset || !el.dataset.k) return;
   const k = el.dataset.k;
   state[k] = el.type === 'checkbox' ? el.checked : (el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value);
-  if (k === 'systemType') renderBomEditor();
+  if (k === 'systemType') {
+    // switching Hybrid / On-grid keeps the same size: fill from that type's package of the same kW, if there is one
+    const prev = packages.find(p => pkgId(p) === state.packageId);
+    const match = prev && packages.find(p => p.type === state.systemType && p.kw === prev.kw);
+    if (match) fillFromPackage(match); else state.packageId = '';
+    fillForm();
+    renderBomEditor();
+  }
   if (k === 'date') state.dateText = '';
   update(); save();
 }
@@ -1146,19 +1269,76 @@ $('#bomAdd').addEventListener('click', () => {
   const rows = $$('#bomList .bom-row');
   rows[rows.length - 1].querySelector('[data-bf="component"]').focus();
 });
-// ---------- Quick picks (project manager) ----------
-function renderChips() {
-  $$('[data-chips]').forEach(box => {
-    const k = box.dataset.chips;
-    box.innerHTML = QUICK[k].map(name => `<button type="button" class="chip" data-pick="${esc(name)}" aria-pressed="${String(state[k]).trim() === name}">${esc(name)}</button>`).join('');
-  });
+// ---------- Project manager: dropdown, with "Other" showing a box to type the name ----------
+const pmSelect = $('#pmSelect'), pmOtherWrap = $('#pmOtherWrap'), pmInput = $('[data-k="projectManager"]');
+pmSelect.innerHTML = '<option value="">Select…</option>' + MANAGERS.map(n => `<option>${esc(n)}</option>`).join('') + '<option value="other">Other</option>';
+let pmOther = false; // "Other" chosen, even before a name is typed
+function syncManager() {
+  const name = String(state.projectManager).trim();
+  // while the name box is being typed in, keep it open even if the text matches a listed name
+  if (document.activeElement !== pmInput) pmOther = name ? !MANAGERS.includes(name) : pmOther;
+  pmSelect.value = pmOther ? 'other' : name;
+  pmOtherWrap.hidden = !pmOther;
 }
-document.addEventListener('click', e => {
-  const chip = e.target.closest && e.target.closest('[data-pick]'); if (!chip) return;
-  const fld = $(`[data-k="${chip.closest('[data-chips]').dataset.chips}"]`);
-  fld.value = chip.dataset.pick;
-  fld.dispatchEvent(new Event('input', { bubbles: true }));
-  fld.dispatchEvent(new Event('change', { bubbles: true }));
+pmSelect.addEventListener('change', () => {
+  pmOther = pmSelect.value === 'other';
+  const current = String(state.projectManager).trim();
+  pmInput.value = pmOther ? (MANAGERS.includes(current) ? '' : current) : pmSelect.value;
+  pmInput.dispatchEvent(new Event('input', { bubbles: true }));
+  if (pmOther) pmInput.focus();
+});
+
+// ---------- Package buttons ----------
+$('#pkgSelect').addEventListener('change', e => {
+  const p = packages.find(x => pkgId(x) === e.target.value);
+  if (p) applyPackage(p); else { state.packageId = ''; update(); save(); }
+});
+$('#pkgRefill').addEventListener('click', () => { const p = currentPackage(); if (p) applyPackage(p); });
+$('#pkgSave').addEventListener('click', () => {
+  const p = currentPackage();
+  if (!p) { $('#pkgNew').click(); return; }
+  if (!confirm(`Save the current system, bill of materials and price as the ${kw(p.kw)} kW ${p.type} package? It will fill in like this next time.`)) return;
+  storeCurrentAs(p.kw);
+});
+$('#pkgNew').addEventListener('click', () => {
+  const answer = prompt(`New ${state.systemType} package. Size in kW:`, String(state.invKw || ''));
+  if (answer === null) return;
+  const size = Number(String(answer).replace(/[^\d.]/g, ''));
+  if (!(size > 0)) { alert('Enter the size in kW, for example 7 or 7.5.'); return; }
+  if (packages.some(p => pkgId(p) === `${state.systemType}-${size}`) &&
+      !confirm(`There is already a ${kw(size)} kW ${state.systemType} package. Replace it with the current details?`)) return;
+  state.invKw = size; // the package's capacity matches its name
+  fillForm();
+  storeCurrentAs(size);
+});
+$('#pkgDelete').addEventListener('click', () => {
+  const p = currentPackage(); if (!p) return;
+  if (!confirm(`Delete the ${kw(p.kw)} kW ${p.type} package? This proposal keeps its details.`)) return;
+  packages = packages.filter(x => x !== p);
+  savePackages();
+  state.packageId = '';
+  update(); save();
+});
+$('#pkgRestore').addEventListener('click', e => {
+  e.preventDefault();
+  if (!confirm('Replace all packages with the demo packages (3, 5 and 10 kW)? Packages saved on this device are removed.')) return;
+  try { localStorage.removeItem(PKG_STORE); } catch (err) { /* ignore */ }
+  loadPackages(); update();
+});
+$('#pkgExport').addEventListener('click', e => {
+  e.preventDefault();
+  downloadBlob(new Blob([JSON.stringify({ app: 'fe-packages', version: 1, packages }, null, 2)], { type: 'application/json' }), 'Future Energies packages.json');
+});
+$('#pkgImport').addEventListener('click', e => { e.preventDefault(); $('#pkgFile').click(); });
+$('#pkgFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    const list = data && data.app === 'fe-packages' && Array.isArray(data.packages) ? data.packages.map(normPackage).filter(Boolean) : [];
+    if (!list.length) throw new Error('no packages');
+    if (confirm(`Replace the packages on this device with the ${list.length} packages in this file?`)) { packages = sortPackages(list); savePackages(); update(); }
+  } catch (err) { alert('That file is not a Future Energies packages file.'); }
+  e.target.value = '';
 });
 
 // ---------- Warranty list ----------
@@ -1490,7 +1670,8 @@ $('#btnResetText').addEventListener('click', e => {
 
 // Init
 $$('[data-edit]').forEach(el => { original[el.dataset.edit] = el.innerHTML; });
-load();
+loadPackages();
+if (!load()) { const first = packages.find(p => pkgId(p) === DEFAULT_PACKAGE); if (first) fillFromPackage(first); } // a new device starts from a package
 wireDatalists();
 fillForm();
 renderBomEditor();
