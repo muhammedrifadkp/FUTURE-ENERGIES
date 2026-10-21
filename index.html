@@ -88,6 +88,19 @@ body.resizing .preview{pointer-events:none}
 .btn.install{border-color:var(--navy);background:var(--navy-50);color:var(--navy);display:inline-flex;align-items:center;gap:5px}
 .btn.install:hover{border-color:var(--navy-d);color:var(--navy-d)}
 .print-tip[hidden],.btn[hidden]{display:none}
+/* PDF made in the browser: progress and "PDF ready" card (shown in the install-modal backdrop) */
+.pdf-card{background:#fff;border-radius:16px;padding:22px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 50px rgba(10,20,45,.25);border:1px solid var(--line)}
+.pdf-card h3{font:600 16px/1.3 var(--sans);margin:0 0 6px;color:var(--ui-ink)}
+.pdf-card p{margin:0 0 14px;font-size:12.5px;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+.pdf-card .btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pdf-bar{height:6px;border-radius:3px;background:var(--line-2);overflow:hidden;margin:4px 0 2px}
+.pdf-bar i{display:block;height:100%;width:0;background:var(--olive);transition:width .2s}
+/* the copy of the pages that is drawn into the PDF */
+.pdf-export .pages{zoom:1!important}
+.pdf-export .page{box-shadow:none}
+.pdf-export .page.overflow::after{display:none}
+.pdf-export [data-bind]:empty::before{content:none}
+.pdf-export [data-edit],.pdf-export [data-bind]{outline:none!important}
 
 /* Top right install button (all views) */
 .top-install-btn{position:fixed;top:14px;right:18px;z-index:999;display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:1px solid var(--navy-d);border-radius:999px;padding:8px 15px;font:600 12.5px/1 var(--sans);cursor:pointer;box-shadow:0 3px 12px rgba(34,58,115,.28);transition:all .18s ease;user-select:none}
@@ -300,7 +313,8 @@ details.grp[open]>summary::after{content:"–"}
     <h1>Proposal builder</h1>
     <p>Fill in the details; the proposal updates as you type.</p>
     <div class="ed-actions">
-      <button class="btn primary" id="btnPrint" type="button">Print / Save PDF</button>
+      <button class="btn primary" id="btnPdf" type="button">Download PDF</button>
+      <button class="btn" id="btnPrint" type="button">Print</button>
       <button class="btn new" id="btnNew" type="button">New proposal</button>
       <button class="btn" id="btnExport" type="button">Save proposal file</button>
       <button class="btn" id="btnImport" type="button">Open proposal file</button>
@@ -311,7 +325,8 @@ details.grp[open]>summary::after{content:"–"}
       </button>
     </div>
     <p class="mem-tip">Everything except the customer details is remembered on this device and filled in again next time. <b>New proposal</b> clears only the customer details and moves the project ID up by one.</p>
-    <p class="print-tip">In the print window, choose <b>Save as PDF</b>, set <b>Margins: None</b> and untick <b>Headers and footers</b>. Otherwise the date and file path are printed at the edges.</p>
+    <p class="print-tip"><b>Download PDF</b> makes an exact A4 file on any phone or computer. On a phone it opens the share menu, so you can send it straight to WhatsApp or save it to Files.</p>
+    <p class="print-tip" id="printTip"><b>Print</b> is for paper. In the print window set <b>Margins: None</b> and untick <b>Headers and footers</b>.</p>
   </div>
   <div class="ed-scroll">
     <div class="warnings" id="warnings"></div>
@@ -697,7 +712,7 @@ details.grp[open]>summary::after{content:"–"}
 <nav class="mobile-bar" aria-label="Sections">
   <button type="button" data-go="editor"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></svg>Details</button>
   <button type="button" data-go="preview"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/></svg>Preview</button>
-  <button type="button" data-go="print" class="pdf"><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Save PDF</button>
+  <button type="button" data-go="pdf" class="pdf"><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Save PDF</button>
 </nav>
 
 <script>
@@ -1245,6 +1260,154 @@ function getPdfFileName() {
   return [name, sys, id].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, '-');
 }
 
+function downloadBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+
+// ---------- PDF made in the browser ----------
+// Each page is drawn to an image (html2canvas) and placed on an exact A4 page, so the file is the same
+// on iPhone, Android and computers: no browser margins, URL or date at the edges.
+const PDF_SCALE = 2.5; // about 240 dpi
+const PDF_QUALITY = 0.92;
+let h2cLoading = null;
+function loadHtml2canvas() {
+  if (window.html2canvas) return Promise.resolve();
+  if (!h2cLoading) h2cLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'assets/vendor/html2canvas.min.js';
+    s.onload = resolve;
+    s.onerror = () => { h2cLoading = null; reject(new Error('html2canvas did not load')); };
+    document.head.appendChild(s);
+  });
+  return h2cLoading;
+}
+const dataUrls = {};
+function toDataUrl(url) {
+  if (!dataUrls[url]) {
+    dataUrls[url] = fetch(url)
+      .then(r => { if (!r.ok) throw new Error(url); return r.blob(); })
+      .then(b => new Promise((resolve, reject) => { const fr = new FileReader(); fr.onload = () => resolve(fr.result); fr.onerror = reject; fr.readAsDataURL(b); }))
+      .catch(err => { delete dataUrls[url]; throw err; });
+  }
+  return dataUrls[url];
+}
+
+// Minimal PDF writer: one full-page JPEG per A4 page
+function makePdf(images, title) {
+  const enc = new TextEncoder();
+  const parts = [], offsets = [];
+  let len = 0;
+  const push = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (n, write) => { offsets[n] = len; push(`${n} 0 obj\n`); write(); push('\nendobj\n'); };
+  const text = s => '<FEFF' + String(s).split('').map(c => c.charCodeAt(0).toString(16).padStart(4, '0')).join('') + '>';
+  const W = 595.28, H = 841.89, first = 4;
+  push('%PDF-1.4\n%âãÏÓ\n');
+  obj(1, () => push('<< /Type /Catalog /Pages 2 0 R >>'));
+  obj(2, () => push(`<< /Type /Pages /Count ${images.length} /Kids [${images.map((_, i) => `${first + i * 3} 0 R`).join(' ')}] >>`));
+  obj(3, () => push(`<< /Title ${text(title)} /Producer ${text('Future Energies Proposal Builder')} >>`));
+  images.forEach((im, i) => {
+    const p = first + i * 3;
+    const draw = `q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q`;
+    obj(p, () => push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im0 ${p + 2} 0 R >> >> /Contents ${p + 1} 0 R >>`));
+    obj(p + 1, () => push(`<< /Length ${draw.length} >>\nstream\n${draw}\nendstream`));
+    obj(p + 2, () => {
+      push(`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.bytes.length} >>\nstream\n`);
+      push(im.bytes);
+      push('\nendstream');
+    });
+  });
+  const count = first + images.length * 3, xref = len;
+  push(`xref\n0 ${count}\n0000000000 65535 f \n`);
+  for (let n = 1; n < count; n++) push(`${String(offsets[n]).padStart(10, '0')} 00000 n \n`);
+  push(`trailer\n<< /Size ${count} /Root 1 0 R /Info 3 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: 'application/pdf' });
+}
+
+async function buildPdf(onProgress) {
+  await loadHtml2canvas();
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  // An SVG drawn as an image can't load other files, so the artwork and photos are embedded first
+  const hrefs = [...new Set($$('.page svg image').map(im => im.getAttribute('href')))];
+  const embedded = Object.fromEntries(await Promise.all(hrefs.map(async h => [h, await toDataUrl(h)])));
+  const pages = $$('.page');
+  const images = [];
+  for (let i = 0; i < pages.length; i++) {
+    onProgress(i, pages.length);
+    const canvas = await window.html2canvas(pages[i], {
+      scale: PDF_SCALE, backgroundColor: '#ffffff', logging: false, windowWidth: 1400, windowHeight: 1000,
+      onclone: doc => {
+        doc.documentElement.classList.add('pdf-export');
+        doc.querySelectorAll('.page svg image').forEach(im => { const h = im.getAttribute('href'); if (embedded[h]) im.setAttribute('href', embedded[h]); });
+      }
+    });
+    const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', PDF_QUALITY));
+    images.push({ bytes: new Uint8Array(await jpeg.arrayBuffer()), w: canvas.width, h: canvas.height });
+    canvas.width = canvas.height = 0; // free the memory straight away on phones
+  }
+  onProgress(pages.length, pages.length);
+  return makePdf(images, getPdfFileName());
+}
+
+function pdfDialog(html, busy) {
+  let el = $('#pdfModal');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'pdfModal';
+    el.className = 'install-modal-backdrop';
+    document.body.appendChild(el);
+    el.addEventListener('click', e => { if (e.target === el && !el.dataset.busy) el.style.display = 'none'; });
+  }
+  if (busy) el.dataset.busy = '1'; else delete el.dataset.busy;
+  el.innerHTML = `<div class="pdf-card" role="dialog" aria-modal="true" aria-labelledby="pdfTitle">${html}</div>`;
+  el.style.display = 'flex';
+  return el;
+}
+let pdfBusy = false;
+$('#btnPdf').addEventListener('click', async () => {
+  if (pdfBusy) return;
+  pdfBusy = true;
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  update();
+  const modal = pdfDialog('<h3 id="pdfTitle">Creating PDF…</h3><p id="pdfStep">Preparing the pages</p><div class="pdf-bar"><i id="pdfFill"></i></div>', true);
+  try {
+    const blob = await buildPdf((done, total) => {
+      $('#pdfStep').textContent = done < total ? `Page ${done + 1} of ${total}` : 'Finishing the file';
+      $('#pdfFill').style.width = `${Math.round(done / total * 100)}%`;
+    });
+    const name = `${getPdfFileName()}.pdf`;
+    const file = typeof File === 'function' ? new File([blob], name, { type: 'application/pdf' }) : null;
+    const phone = window.matchMedia('(pointer: coarse)').matches;
+    const canShare = phone && file && navigator.canShare && navigator.canShare({ files: [file] });
+    const size = `${(blob.size / 1048576).toFixed(1)} MB`;
+    if (!canShare) downloadBlob(blob, name);
+    pdfDialog(`<h3 id="pdfTitle">PDF ready</h3><p>${esc(name)} · ${size}${canShare ? '' : '<br>Saved to your downloads.'}</p>
+      <div class="btns">${canShare ? '<button class="btn primary" type="button" id="pdfShare">Share / Save</button>' : ''}
+      <button class="btn${canShare ? '' : ' primary'}" type="button" id="pdfDownload">${canShare ? 'Download' : 'Download again'}</button>
+      <button class="btn" type="button" id="pdfClose">Close</button></div>`);
+    $('#pdfDownload').addEventListener('click', () => downloadBlob(blob, name));
+    $('#pdfClose').addEventListener('click', () => { modal.style.display = 'none'; });
+    $('#pdfShare')?.addEventListener('click', async () => {
+      try { await navigator.share({ files: [file], title: name }); modal.style.display = 'none'; }
+      catch (err) { if (err && err.name !== 'AbortError') downloadBlob(blob, name); }
+    });
+  } catch (err) {
+    pdfDialog('<h3 id="pdfTitle">Couldn’t create the PDF</h3><p>Please try again. If it keeps failing, reload the app.</p><div class="btns"><button class="btn primary" type="button" id="pdfClose">Close</button></div>');
+    $('#pdfClose').addEventListener('click', () => { $('#pdfModal').style.display = 'none'; });
+  } finally {
+    pdfBusy = false;
+  }
+});
+
+// Safari (iPhone, iPad, Mac) prints with its own margins and the URL/date, so only Download PDF is offered there
+const ua = navigator.userAgent;
+const safariPrint = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+  (/Safari\//.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/.test(ua));
+if (safariPrint) { $('#btnPrint').hidden = true; $('#printTip').hidden = true; }
+
 // Actions
 $('#btnPrint').addEventListener('click', () => {
   const t = document.title;
@@ -1307,7 +1470,7 @@ window.addEventListener('load', update);
 
 $$('.mobile-bar [data-go]').forEach(b => b.addEventListener('click', () => {
   const go = b.dataset.go;
-  if (go === 'print') { $('#btnPrint').click(); return; }
+  if (go === 'pdf') { $('#btnPdf').click(); return; }
   (go === 'editor' ? $('.editor') : $('#preview')).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }));
 

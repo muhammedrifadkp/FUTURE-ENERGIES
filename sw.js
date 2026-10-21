@@ -1,6 +1,6 @@
 // Offline support for the Future Energies Proposal Builder.
 // After you change any file and redeploy, raise the version number so phones pick up the update.
-const CACHE = 'fe-proposals-v3';
+const CACHE = 'fe-proposals-v4';
 
 const ART = [
   'p1-deco', 'p1-tri', 'p1-stats', 'p2-deco', 'p3-top', 'p3-bottom', 'p4-leaf', 'p4-panel', 'p5-sprig', 'p6-right', 'p6-dot', 'p6-bottom',
@@ -16,6 +16,7 @@ const FILES = [
   'manifest.webmanifest',
   'assets/logo.png',
   'assets/photo.jpg',
+  'assets/vendor/html2canvas.min.js',
   ...['waaree.png', 'havells.svg', 'deye.png', 'adani.png', 'renewsys.png', 'vikram.png', 'tata-power.png', 'premier.png'].map(b => `assets/brands/${b}`),
   ...ART.map(a => `assets/art/${a}.svg`),
   'icons/icon-192.png',
