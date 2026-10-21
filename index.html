@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Future Energies Proposal Builder</title>
+<meta name="description" content="Create Future Energies solar proposals and save them as PDF.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#223A73">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FE Proposals">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+/* Static fonts stored with the app, so PDFs embed real text fonts and it works offline */
+@font-face{font-family:'Bodoni Moda';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/bodoni-moda-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Bodoni Moda';font-style:italic;font-weight:400;font-display:swap;src:url(assets/fonts/bodoni-moda-latin-400-italic.woff2) format('woff2')}
+@font-face{font-family:'Bodoni Moda';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/bodoni-moda-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Bodoni Moda';font-style:italic;font-weight:600;font-display:swap;src:url(assets/fonts/bodoni-moda-latin-600-italic.woff2) format('woff2')}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/noto-sans-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/noto-sans-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/noto-sans-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/noto-sans-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/noto-sans-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/noto-sans-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/noto-sans-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Noto Sans';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/noto-sans-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/barlow-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/barlow-latin-600-normal.woff2) format('woff2')}
+
+/* Page positions are written in PDF points (as measured from the original design): --x/--y/--w/--b/--fs/--lh.
+   Registered as non-inherited so a child never picks up its parent's position. */
+@property --x{syntax:'*';inherits:false}
+@property --y{syntax:'*';inherits:false}
+@property --w{syntax:'*';inherits:false}
+@property --b{syntax:'*';inherits:false}
+@property --fs{syntax:'*';inherits:false}
+@property --lh{syntax:'*';inherits:false}
+
+:root{
+  --u:1mm; /* one design millimetre; scaled down in print to fit the printable area */
+  --pt:calc(var(--u)*.35278); /* one PDF point */
+  /* brand (from the Future Energies proposal) */
+  --navy:#223A73; --navy-d:#10223F; --navy-x:#0E173D;
+  --lime:#98C93E; --lime-2:#8DC63F; --olive:#8CB23F; --olive-2:#83A94D;
+  --tint:#F7F9F2; --cream:#F9F3EA; --cream-2:#FBF8F3; --ink:#231F20; --grey:#58595B;
+  /* editor */
+  --ui-ink:#18202F; --ui-ink-2:#3E4859; --muted:#6A7385; --line:#DCE1EA; --line-2:#EEF1F5;
+  --desk:#E6E9EF; --lime-50:#F1F8E5; --lime-100:#DDEDC2; --navy-50:#E9EDF6;
+  --danger:#B42318; --danger-50:#FDECEA; --info:#7A5A00; --info-50:#FDF5E0;
+  --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
+  --sans:'Noto Sans','Segoe UI',system-ui,sans-serif;
+  --kick:'Barlow','Bahnschrift','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0}
+body{font-family:var(--sans);color:var(--ui-ink);background:var(--desk);display:grid;grid-template-columns:370px 1fr;height:100vh;overflow:hidden}
+
+/* ---------- Editor ---------- */
+.editor{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.ed-head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
+.ed-head img{height:34px;display:block}
+.ed-head h1{font:600 15px/1.3 var(--sans);margin:10px 0 2px}
+.ed-head p{margin:0;font-size:12px;color:var(--muted)}
+.ed-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.btn{font:600 12px var(--sans);border:1px solid var(--line);background:#fff;color:var(--ui-ink);border-radius:8px;padding:8px 11px;cursor:pointer}
+.btn:hover{border-color:var(--navy);color:var(--navy)}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy-d);color:#fff}
+.btn.new{background:var(--lime-50);border-color:var(--olive);color:#3D5714}
+.btn.new:hover{background:var(--lime-100);color:#2C4010}
+.btn:focus-visible,.fld input:focus-visible,.fld select:focus-visible,.fld textarea:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.print-tip{margin:10px 0 0;font-size:11.5px;line-height:1.45;color:var(--ui-ink-2);background:var(--line-2);border-radius:7px;padding:7px 9px}
+.print-tip b{font-weight:600;color:var(--ui-ink)}
+.mem-tip{margin:8px 0 0;font-size:11.5px;line-height:1.45;color:#3D5714;background:var(--lime-50);border-radius:7px;padding:7px 9px}
+.btn.install{border-color:var(--navy);background:var(--navy-50);color:var(--navy);display:inline-flex;align-items:center;gap:5px}
+.btn.install:hover{border-color:var(--navy-d);color:var(--navy-d)}
+.print-tip[hidden],.btn[hidden]{display:none}
+
+/* Top right install button (all views) */
+.top-install-btn{position:fixed;top:14px;right:18px;z-index:999;display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:1px solid var(--navy-d);border-radius:999px;padding:8px 15px;font:600 12.5px/1 var(--sans);cursor:pointer;box-shadow:0 3px 12px rgba(34,58,115,.28);transition:all .18s ease;user-select:none}
+.top-install-btn:hover{background:var(--navy-d);transform:translateY(-1px);box-shadow:0 5px 16px rgba(34,58,115,.38)}
+.top-install-btn:active{transform:translateY(0)}
+.top-install-btn .ico{width:14px;height:14px;stroke-width:2.2}
+
+/* Install modal */
+.install-modal-backdrop{position:fixed;inset:0;background:rgba(12,20,40,.6);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px;animation:imFadeIn .18s ease-out}
+.install-modal{background:#fff;border-radius:18px;max-width:440px;width:100%;box-shadow:0 24px 50px rgba(10,20,45,.25);border:1px solid var(--line);overflow:hidden;animation:imSlideUp .22s cubic-bezier(.16,1,.3,1)}
+@keyframes imFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes imSlideUp{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.im-head{display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--line-2)}
+.im-icon{width:44px;height:44px;border-radius:11px;box-shadow:0 2px 8px rgba(34,58,115,.15);flex:none;object-fit:cover}
+.im-title{flex:1}
+.im-title h3{font:600 16px/1.2 var(--sans);margin:0 0 3px;color:var(--ui-ink)}
+.im-title p{margin:0;font-size:12px;color:var(--muted);line-height:1.35}
+.im-close{width:32px;height:32px;border:none;background:var(--line-2);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ui-ink-2);transition:all .15s}
+.im-close:hover{background:var(--line);color:var(--ui-ink)}
+.im-body{padding:18px 20px;display:flex;flex-direction:column;gap:11px}
+.im-step{display:flex;gap:12px;align-items:flex-start;background:var(--line-2);padding:11px 13px;border-radius:12px}
+.im-step-n{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font:700 12px/24px var(--sans);text-align:center;flex:none}
+.im-step-txt{font-size:13px;line-height:1.45;color:var(--ui-ink-2);flex:1}
+.im-step-txt b{color:var(--ui-ink);font-weight:600}
+.im-step-txt .sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.im-foot{padding:12px 20px 18px;border-top:1px solid var(--line-2);display:flex;justify-content:flex-end;gap:8px}
+
+.ed-scroll{overflow:auto;flex:1;padding:6px 0 30px}
+.warnings{margin:10px 18px 0;display:flex;flex-direction:column;gap:6px}
+.warn{font-size:12px;line-height:1.4;background:var(--danger-50);color:var(--danger);border-radius:8px;padding:8px 10px}
+.warn.info{background:var(--info-50);color:var(--info)}
+details.grp{border-bottom:1px solid var(--line-2);padding:0 18px}
+details.grp>summary{font:600 13px var(--sans);padding:13px 0;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::after{content:"+";font:500 16px var(--sans);color:var(--muted)}
+details.grp[open]>summary::after{content:"–"}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;padding-bottom:14px}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--ui-ink-2);font-weight:500}
+.fld.full{grid-column:1/-1}
+.fld.chk{flex-direction:row;align-items:center;gap:7px;font-weight:500}
+.fld.chk input{width:16px;height:16px;accent-color:var(--navy)}
+.fld input:not([type=checkbox]),.fld select,.fld textarea{font:400 13px var(--sans);color:var(--ui-ink);border:1px solid var(--line);border-radius:7px;padding:7px 8px;background:#fff;width:100%;min-width:0}
+.fld textarea{resize:vertical;line-height:1.4}
+.sub-h{grid-column:1/-1;font:600 11.5px var(--sans);color:var(--navy);margin-top:6px;letter-spacing:.02em}
+.hint{grid-column:1/-1;font-size:11.5px;color:#3D5714;background:var(--lime-50);border-radius:7px;padding:7px 9px;line-height:1.45}
+.tip{font-size:11.5px;color:var(--muted);padding:12px 18px 0;line-height:1.45}
+.tip a{color:var(--navy)}
+.pay-row{grid-column:1/-1;display:grid;grid-template-columns:62px 1fr 1fr;gap:6px;align-items:end}
+.bom-ed{padding-bottom:14px}
+.bom-note{font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 10px}
+.bom-note b{color:var(--ui-ink-2)}
+.bom-row{border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:8px;background:#fff}
+.bom-row.auto{background:var(--lime-50);border-color:var(--lime-100)}
+.bom-head{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.bom-n{font:600 11.5px var(--sans);color:var(--ui-ink-2);min-width:18px}
+.bom-kind{flex:1;font-size:11px;font-weight:600;color:#3D5714}
+.bom-ctrl{display:flex;gap:4px}
+.bom-ctrl button{width:28px;height:26px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-size:12px;color:var(--ui-ink-2);padding:0}
+.bom-ctrl button:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}
+.bom-ctrl button[data-act="del"]:hover{border-color:var(--danger);color:var(--danger)}
+.bom-ctrl button:disabled{opacity:.35;cursor:default}
+.bom-ctrl button:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.bom-grid{display:grid;grid-template-columns:1fr 1fr .8fr;gap:6px}
+.bom-grid [data-bf="component"],.bom-grid [data-bf="spec"]{grid-column:span 2}
+.bom-grid input{font:400 12.5px var(--sans);color:var(--ui-ink);border:1px solid var(--line);border-radius:6px;padding:6px 7px;min-width:0;width:100%;background:#fff}
+.bom-grid input::placeholder{color:#98A1B0}
+.bom-grid input:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.bom-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- Preview ---------- */
+.preview{overflow:auto;padding:28px 24px 60px;min-width:0}
+.pages{display:flex;flex-direction:column;align-items:center;gap:22px;zoom:var(--z,1)}
+.page{width:calc(210*var(--u));height:calc(297*var(--u));background:#fff;box-shadow:0 2px 14px rgba(15,25,50,.15);position:relative;overflow:hidden;flex:none;font-family:var(--sans);color:var(--ink);line-height:1.2}
+.page.overflow::after{content:"Content too long for this page — shorten text";position:absolute;top:calc(8*var(--pt));left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font:600 calc(9*var(--pt)) var(--sans);padding:calc(5*var(--pt)) calc(10*var(--pt));border-radius:calc(5*var(--pt));z-index:5;white-space:nowrap}
+.page h1,.page h2,.page p,.page ul{margin:0;padding:0;font-weight:400}
+.page ul{list-style:none}
+.page em{font-style:italic}
+[data-edit]{border-radius:calc(4*var(--pt));transition:outline-color .15s}
+[data-edit]:hover{outline:1px dashed #A9C77A;outline-offset:calc(3*var(--pt))}
+[data-edit]:focus{outline:1.5px solid var(--lime);outline-offset:calc(3*var(--pt))}
+
+/* positioning helpers (values in points) */
+.art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+.a{position:absolute;left:calc(var(--x)*var(--pt));top:calc(var(--y)*var(--pt));width:calc(var(--w)*var(--pt))}
+.ab{position:absolute;left:calc(var(--x)*var(--pt));bottom:calc(var(--b)*var(--pt));width:calc(var(--w)*var(--pt))}
+.t{position:absolute;left:calc(var(--x)*var(--pt));top:calc((var(--y) - var(--fs)*.6)*var(--pt));font-size:calc(var(--fs)*var(--pt));line-height:1.2;white-space:nowrap}
+.tl{position:absolute;left:calc(var(--x)*var(--pt));top:calc((var(--y) - var(--lh)/2)*var(--pt));width:calc(var(--w)*var(--pt));font-size:calc(var(--fs)*var(--pt));line-height:calc(var(--lh)*var(--pt))}
+.tc{transform:translateX(-50%)}
+.pre{white-space:pre-line}
+.serif{font-family:var(--serif)}
+.green{color:var(--lime)}
+.olive{color:var(--olive)}
+.white{color:#fff}
+.page .b6{font-weight:600}
+
+.logo{position:absolute;left:calc(39*var(--pt));top:calc(var(--y)*var(--pt));width:calc(184*var(--pt));height:auto}
+.kick{font-family:var(--kick);font-weight:600;letter-spacing:.27em;color:var(--lime-2);text-transform:uppercase}
+.pnum{position:absolute;right:calc(54*var(--pt));top:calc(802*var(--pt));font:400 calc(10*var(--pt))/1.2 var(--sans);letter-spacing:.14em;color:var(--grey);white-space:pre}
+
+/* 1. cover */
+.stat-lbl{letter-spacing:.07em}
+
+/* 2. about */
+.brands{display:flex;flex-wrap:wrap;justify-content:center;gap:calc(20*var(--pt)) calc(58.5*var(--pt))}
+.brand{width:calc(117*var(--pt));height:calc(62*var(--pt));border:calc(1*var(--pt)) solid var(--ink);border-radius:calc(12*var(--pt));display:flex;align-items:center;justify-content:center}
+.brand img{display:block;height:auto}
+
+/* 4. system configuration */
+.bomwrap{border:1px solid #CFD0D3;border-radius:calc(9*var(--pt));overflow:hidden;background:#fff}
+.bomt{width:100%;border-collapse:collapse;table-layout:fixed}
+.bomt th{background:var(--lime);color:#fff;font:400 calc(9.9*var(--pt))/1 var(--serif);text-align:center;height:calc(21*var(--pt));padding:0 calc(4*var(--pt))}
+.bomt td{font-size:calc(7.9*var(--pt));line-height:1.25;height:calc(19*var(--pt));padding:calc(1.8*var(--pt)) calc(6*var(--pt));border-top:1px solid #D9DADC;vertical-align:middle;overflow-wrap:anywhere}
+.bomt td+td{border-left:1px solid #D9DADC}
+.bomt td:nth-child(1){padding-left:calc(31*var(--pt))}
+.bomt td:nth-child(2){padding-left:calc(16*var(--pt))}
+.bomt td:nth-child(3){padding-left:calc(12*var(--pt))}
+.bomt td:nth-child(4){text-align:center}
+.bomt tbody tr:first-child td{border-top:none}
+.bomwrap.tight td{height:calc(15*var(--pt));padding-top:calc(1.2*var(--pt));padding-bottom:calc(1.2*var(--pt))}
+.offer{background:var(--cream);border-radius:calc(5.5*var(--pt));padding:calc(13*var(--pt)) calc(24*var(--pt)) calc(6*var(--pt)) calc(18*var(--pt))}
+.offer-title{font:700 calc(11*var(--pt))/1.2 var(--sans);color:var(--lime);margin-bottom:calc(3*var(--pt))}
+.orow{display:flex;justify-content:space-between;align-items:baseline;font-size:calc(8*var(--pt));line-height:calc(14*var(--pt));color:var(--navy-x)}
+.orow b{font-weight:600}
+.oline{border-top:1px solid #CBCBCD;margin:calc(1*var(--pt)) calc(-10*var(--pt)) calc(12*var(--pt)) calc(-5*var(--pt))}
+.ototal{display:flex;justify-content:space-between;align-items:center;background:var(--navy-x);color:#fff;border-radius:calc(11.5*var(--pt));height:calc(23*var(--pt));padding:0 calc(14*var(--pt)) 0 calc(17*var(--pt));margin:0 calc(-21*var(--pt)) 0 calc(-5*var(--pt));font-size:calc(10*var(--pt))}
+.ototal b{font-weight:700;font-size:calc(11.5*var(--pt))}
+.osub{display:flex;justify-content:space-between;font-size:calc(7.6*var(--pt));color:var(--navy-x);margin-top:calc(5*var(--pt));line-height:1.3}
+.osub b{font-weight:600}
+
+/* 5. terms */
+.ilist li{display:grid;align-items:start;font-size:calc(7.9*var(--pt));line-height:calc(11*var(--pt))}
+.ilist img{display:block;height:auto}
+.tc-list li{grid-template-columns:calc(32*var(--pt)) 1fr;column-gap:calc(12*var(--pt));min-height:calc(48*var(--pt))}
+.tc-list li>div{padding-top:calc(3*var(--pt));max-width:calc(196*var(--pt))}
+/* keep the first lines clear of the plant stem drawn on the right */
+.tc-list li:nth-child(1)>div{max-width:calc(172*var(--pt))}
+.tc-list li:nth-child(2)>div{max-width:calc(184*var(--pt))}
+.amc-list li{grid-template-columns:calc(25*var(--pt)) 1fr;margin-bottom:calc(18*var(--pt))}
+.amc-list li:last-child{margin-bottom:0}
+.amc-list li>div{padding-top:calc(4*var(--pt))}
+.wlist{display:flex;gap:calc(22*var(--pt));color:#fff}
+.wlist span>span:first-child{color:var(--olive)}
+
+/* 6. contact */
+.ccard{background:var(--olive);color:#fff;border-radius:calc(12*var(--pt));padding:calc(39*var(--pt)) calc(12*var(--pt)) calc(18*var(--pt)) calc(19*var(--pt))}
+.ccard .ct{font-size:calc(17.8*var(--pt));line-height:1.2}
+.csep{border-top:calc(.6*var(--pt)) solid #B5D865;margin:calc(10*var(--pt)) calc(18*var(--pt)) calc(10*var(--pt)) 0}
+.crow{display:grid;grid-template-columns:calc(26*var(--pt)) 1fr;column-gap:calc(9*var(--pt));align-items:start;font-size:calc(11.5*var(--pt));line-height:calc(18*var(--pt));margin-bottom:calc(7*var(--pt));overflow-wrap:break-word}
+.crow:last-child{margin-bottom:0}
+.crow img{display:block;margin-top:calc(1*var(--pt))}
+
+/* ---------- Responsive & print ---------- */
+.mobile-bar{display:none}
+@media (max-width:1000px){
+  body{grid-template-columns:1fr;height:auto;overflow:visible;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+  .mobile-bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;gap:8px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);box-shadow:0 -2px 10px rgba(15,25,50,.08)}
+  .mobile-bar button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font:600 13px var(--sans);color:var(--ui-ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;cursor:pointer}
+  .mobile-bar button .ico{font-size:16px}
+  .mobile-bar button.pdf{background:var(--navy);border-color:var(--navy);color:#fff}
+  .mobile-bar button:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+  .editor{border-right:none;border-bottom:1px solid var(--line)}
+  .ed-scroll{overflow:visible}
+  .preview{overflow:visible;padding:16px}
+  .top-install-btn{top:10px;right:12px;padding:6px 12px;font-size:11.5px;z-index:1001}
+}
+.ico{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@page{size:A4;margin:0}
+@media print{
+  :root{--u:min(calc(100vh / 297.5),calc(100vw / 210.4))}
+  html,body{background:#fff;height:auto;overflow:visible;display:block;padding:0!important;margin:0!important}
+  .editor,.mobile-bar,.top-install-btn,.install-modal-backdrop{display:none!important}
+  .preview{padding:0;overflow:visible}
+  .pages{zoom:1!important;gap:0;display:block}
+  .page{box-shadow:none;margin:0 auto;break-after:page;page-break-after:always}
+  .page:last-child{break-after:auto;page-break-after:auto}
+  .page.overflow::after{display:none}
+  [data-edit]:hover,[data-edit]:focus{outline:none}
+}
+</style>
+</head>
+<body>
+
+<button class="top-install-btn" id="topInstallBtn" type="button" aria-label="Install Future Energies app">
+  <svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+  <span>Install app</span>
+</button>
+
+<!-- =================== EDITOR =================== -->
+<aside class="editor" aria-label="Proposal details">
+  <div class="ed-head">
+    <img src="assets/logo.png" alt="Future Energies">
+    <h1>Proposal builder</h1>
+    <p>Fill in the details; the proposal updates as you type.</p>
+    <div class="ed-actions">
+      <button class="btn primary" id="btnPrint" type="button">Print / Save PDF</button>
+      <button class="btn new" id="btnNew" type="button">New proposal</button>
+      <button class="btn" id="btnExport" type="button">Save proposal file</button>
+      <button class="btn" id="btnImport" type="button">Open proposal file</button>
+      <input type="file" id="fileImport" accept=".json,application/json" hidden>
+      <button class="btn install" id="btnInstall" type="button">
+        <svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Install app</span>
+      </button>
+    </div>
+    <p class="mem-tip">Everything except the customer details is remembered on this device and filled in again next time. <b>New proposal</b> clears only the customer details and moves the project ID up by one.</p>
+    <p class="print-tip">In the print window, choose <b>Save as PDF</b>, set <b>Margins: None</b> and untick <b>Headers and footers</b>. Otherwise the date and file path are printed at the edges.</p>
+  </div>
+  <div class="ed-scroll">
+    <div class="warnings" id="warnings"></div>
+    <p class="tip">Tip: text with a dashed outline on hover (about the company, general T&amp;C, AMC) can be edited directly on the page. <a href="#" id="btnResetText">Reset edited text</a></p>
+
+    <details class="grp" open><summary>Customer details</summary>
+      <div class="grid2">
+        <label class="fld full"><span>Client name</span><input data-k="custName" autocomplete="off"></label>
+        <label class="fld full"><span>Address</span><input data-k="custAddress" autocomplete="off"></label>
+        <label class="fld"><span>Contact no.</span><input data-k="custPhone" inputmode="tel" autocomplete="off"></label>
+        <label class="fld"><span>Mail ID (optional)</span><input data-k="custEmail" inputmode="email" autocomplete="off"></label>
+      </div>
+    </details>
+
+    <details class="grp" open><summary>Project details</summary>
+      <div class="grid2">
+        <label class="fld"><span>Project ID</span><input data-k="projectId"></label>
+        <label class="fld"><span>Date</span><input type="date" data-k="date"></label>
+        <label class="fld"><span>Prepared by</span><input data-k="preparedBy" data-hist="preparedBy"></label>
+        <label class="fld"><span>Project manager</span><input data-k="projectManager" data-hist="projectManager"></label>
+        <label class="fld full"><span>Project name (leave empty to fill in from the system)</span><input data-k="projectName" data-hist="projectName"></label>
+        <label class="fld"><span>Proposal valid (days)</span><input type="number" min="1" data-k="validDays"></label>
+      </div>
+    </details>
+
+    <details class="grp" open><summary>System</summary>
+      <div class="grid2">
+        <label class="fld"><span>System type</span>
+          <select data-k="systemType"><option>Hybrid</option><option>On-grid</option><option>Off-grid</option></select></label>
+        <label class="fld"><span>Capacity / inverter (kW)</span><input type="number" step="0.5" min="0" data-k="invKw"></label>
+        <label class="fld"><span>Connection</span>
+          <select data-k="phase"><option>Three phase</option><option>Single phase</option></select></label>
+        <label class="fld"><span>Inverter brand</span><input data-k="invMake" data-hist="invMake"></label>
+        <div class="sub-h">Solar panels</div>
+        <label class="fld"><span>Panel brand</span><input data-k="panelMake" data-hist="panelMake"></label>
+        <label class="fld"><span>Panel rating (Wp)</span><input type="number" step="5" min="0" data-k="panelWatt"></label>
+        <label class="fld"><span>No. of panels</span><input type="number" min="0" data-k="panelCount"></label>
+        <label class="fld full"><span>Panel specification</span><input data-k="panelTech" data-hist="panelTech"></label>
+        <div class="sub-h" data-when="systemType!=On-grid">Battery</div>
+        <label class="fld" data-when="systemType!=On-grid"><span>Battery brand</span><input data-k="batteryMake" data-hist="batteryMake"></label>
+        <label class="fld" data-when="systemType!=On-grid"><span>No. of batteries</span><input type="number" min="0" data-k="batteryCount"></label>
+        <label class="fld full" data-when="systemType!=On-grid"><span>Battery specification</span><input data-k="batterySpec" data-hist="batterySpec"></label>
+        <div class="hint" data-hint="system"></div>
+      </div>
+    </details>
+
+    <details class="grp" id="bomGroup"><summary>Bill of materials</summary>
+      <div class="bom-ed">
+        <p class="bom-note">This is the list for <b data-type-label></b> systems; changes are remembered for that system type. Green rows fill in from the System section; grey text is the automatic value, and typing over it replaces it.</p>
+        <div id="bomList"></div>
+        <div class="bom-actions">
+          <button class="btn primary" type="button" id="bomAdd">+ Add item</button>
+          <button class="btn" type="button" id="bomReset">Restore default list</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="grp" open><summary>Commercial offer</summary>
+      <div class="grid2">
+        <label class="fld full"><span>System cost, before GST (₹)</span><input type="number" step="500" min="0" data-k="systemCost"></label>
+        <label class="fld"><span>GST rate (%)</span><input type="number" step="0.1" min="0" data-k="gstPct"></label>
+        <label class="fld"><span>Subsidy</span>
+          <select data-k="subsidyMode"><option value="none">No subsidy</option><option value="auto">PM Surya Ghar (auto)</option><option value="custom">Custom amount</option></select></label>
+        <label class="fld" data-when="subsidyMode=custom"><span>Subsidy amount (₹)</span><input type="number" step="1000" min="0" data-k="subsidyCustom"></label>
+        <div class="hint" data-hint="price"></div>
+      </div>
+    </details>
+
+    <details class="grp"><summary>Payment terms</summary>
+      <div class="grid2">
+        <div class="pay-row"><label class="fld"><span>Step 1 %</span><input type="number" min="0" max="100" data-k="pay1Pct"></label><label class="fld"><span>first line</span><input data-k="pay1a"></label><label class="fld"><span>second line</span><input data-k="pay1b"></label></div>
+        <div class="pay-row"><label class="fld"><span>Step 2 %</span><input type="number" min="0" max="100" data-k="pay2Pct"></label><label class="fld"><span>first line</span><input data-k="pay2a"></label><label class="fld"><span>second line</span><input data-k="pay2b"></label></div>
+        <div class="pay-row"><label class="fld"><span>Step 3 %</span><input type="number" min="0" max="100" data-k="pay3Pct"></label><label class="fld"><span>first line</span><input data-k="pay3a"></label><label class="fld"><span>second line</span><input data-k="pay3b"></label></div>
+        <label class="fld"><span>Late fee per month (%)</span><input type="number" step="0.1" min="0" data-k="lateFeePct"></label>
+        <label class="fld"><span>Payment options</span><input data-k="payModes" data-hist="payModes"></label>
+        <div class="hint" data-hint="pay"></div>
+      </div>
+    </details>
+
+    <details class="grp"><summary>KSEB charges, AMC &amp; warranty</summary>
+      <div class="grid2">
+        <label class="fld"><span>KSEB feasibility fee</span><input data-k="ksebFeasibility"></label>
+        <label class="fld"><span>Registration fee</span><input data-k="ksebRegistration"></label>
+        <label class="fld"><span>Electrical inspectorate</span><input data-k="inspectorate"></label>
+        <label class="fld"><span>Free maintenance (years)</span><input type="number" min="0" data-k="amcYears"></label>
+        <label class="fld"><span>Panel warranty (years)</span><input type="number" min="0" data-k="panelWarranty"></label>
+        <label class="fld"><span>Inverter warranty (years)</span><input type="number" min="0" data-k="invWarranty"></label>
+        <label class="fld" data-when="systemType!=On-grid"><span>Battery warranty (years)</span><input type="number" min="0" data-k="batteryWarranty"></label>
+      </div>
+    </details>
+
+    <details class="grp"><summary>Cover &amp; brands</summary>
+      <div class="grid2">
+        <label class="fld"><span>Average energy savings</span><input data-k="statSavings"></label>
+        <label class="fld"><span>Projects completed</span><input data-k="statProjects"></label>
+        <div class="sub-h">Brands shown on page 2</div>
+        <label class="fld chk"><input type="checkbox" data-k="brand_waaree">Waaree</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_adani">Adani Solar</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_renewsys">RenewSys</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_vikram">Vikram Solar</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_tata">Tata Power</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_premier">Premier Energies</label>
+      </div>
+    </details>
+
+    <details class="grp"><summary>Company &amp; bank details</summary>
+      <div class="grid2">
+        <label class="fld"><span>Phone 1</span><input data-k="coPhone1"></label>
+        <label class="fld"><span>Phone 2</span><input data-k="coPhone2"></label>
+        <label class="fld"><span>Email</span><input data-k="coEmail"></label>
+        <label class="fld"><span>Instagram</span><input data-k="coInsta"></label>
+        <label class="fld full"><span>Address (one line per row)</span><textarea rows="3" data-k="coAddress"></textarea></label>
+        <label class="fld full"><span>GST no.</span><input data-k="gstNo"></label>
+        <label class="fld"><span>Bank</span><input data-k="bankName"></label>
+        <label class="fld"><span>Branch</span><input data-k="bankBranch"></label>
+        <label class="fld"><span>Account number</span><input data-k="bankAcc"></label>
+        <label class="fld"><span>IFSC code</span><input data-k="bankIfsc"></label>
+        <label class="fld"><span>Account name (optional)</span><input data-k="bankAccName"></label>
+        <label class="fld"><span>UPI ID (optional)</span><input data-k="bankUpi"></label>
+      </div>
+    </details>
+  </div>
+</aside>
+
+<!-- =================== PROPOSAL =================== -->
+<main class="preview" id="preview">
+<div class="pages" id="pages">
+
+<!-- ========== 1. COVER ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <defs><clipPath id="clipCover"><path d="M564 372.8C532.3 387.7 522.5 377.7 522.5 377.7C474.1 357 433.4 389 433.4 389L133.6 550C77.2 570.8 79.4 613.9 79.4 613.9L79.4 680.8L595.3 680.8L595.3 358Z"/></clipPath></defs>
+    <image href="assets/art/p1-deco.svg" x="395" y="0" width="200.3" height="408"/>
+    <image href="assets/art/p1-tri.svg" x="0" y="470" width="142" height="214"/>
+    <image href="assets/photo.jpg" x="79" y="288" width="517" height="517" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipCover)"/>
+    <image href="assets/art/p1-stats.svg" x="60" y="700" width="480" height="78"/>
+    <line x1="49" y1="204.5" x2="80" y2="204.5" stroke="#98C93E" stroke-width="2"/>
+    <line x1="41" y1="350.5" x2="77" y2="350.5" stroke="#98C93E" stroke-width=".5"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:51">
+  <div class="t kick" style="--x:92;--y:203;--fs:13">Solar Energy Proposal</div>
+  <h1 class="tl serif b6" style="--x:42;--y:254;--fs:48;--lh:49;--w:420">Future Energy,<br><em class="green">Bright</em> Energy.</h1>
+  <p class="tl serif" style="--x:40;--y:384.5;--fs:14;--lh:20;--w:260;font-style:italic">A tailored solar transition plan -<br>engineered for efficiency, built for<br>scale, designed to last.</p>
+  <div class="t serif" style="--x:123;--y:733;--fs:24" data-f="statSavings"></div>
+  <div class="tl stat-lbl" style="--x:124;--y:750;--fs:9;--lh:15;--w:100">Average Energy<br>Savings</div>
+  <div class="t serif" style="--x:304;--y:733;--fs:24.7"><span data-f="panelWarranty"></span><span class="green" style="font-size:.69em"> years</span></div>
+  <div class="tl stat-lbl" style="--x:305;--y:750;--fs:9;--lh:15;--w:90">Performance<br>Warranty</div>
+  <div class="t serif" style="--x:472;--y:733;--fs:24"><span data-f="statProjNum"></span><span class="green" style="font-size:1.4em;line-height:0" data-f="statProjPlus"></span></div>
+  <div class="tl stat-lbl" style="--x:473;--y:750;--fs:9;--lh:15;--w:80">Projects<br>Completed</div>
+  <div class="pnum" style="color:var(--ink)">PROPOSAL / 01</div>
+</section>
+
+<!-- ========== 2. ABOUT & BRANDS ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <defs><clipPath id="clipAbout"><path d="M391.2 265.1C332.2 327.9 336.1 363.7 336.1 363.7L336.1 491L595.3 491L595.3 59.7C541.9 100.6 391.2 265.1 391.2 265.1Z"/></clipPath></defs>
+    <image href="assets/art/p2-deco.svg" x="340" y="0" width="255.3" height="322"/>
+    <image href="assets/photo.jpg" x="186" y="59" width="434" height="433" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipAbout)"/>
+    <line x1="38" y1="164.3" x2="65" y2="164.3" stroke="#83A94D" stroke-width="1"/>
+    <line x1="44" y1="491" x2="539" y2="491" stroke="#83A94D" stroke-width=".5"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:39">
+  <div class="t kick" style="--x:78;--y:162.5;--fs:14;font-weight:600;color:var(--olive-2)">About the company</div>
+  <div class="tl serif" style="--x:40;--y:232.5;--fs:13;--lh:21;--w:307;font-style:italic" data-edit="about" contenteditable="true" spellcheck="false" data-max="480">Future Energies is a trusted solar energy company committed to delivering reliable, efficient, and sustainable solar solutions across Kerala. We provide end-to-end services, including consultation, system design, supply, installation, approvals, and after-sales support. With a focus on quality, innovation, and customer satisfaction, we ensure every project is completed to the highest standards, helping our customers achieve long-term energy savings and a greener future.</div>
+  <h2 class="t serif" style="--x:40;--y:530.5;--fs:21">Trusted Brands We Work With</h2>
+  <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, Future Energies partners with India’s most<br>trusted and reputed solar brands</p>
+  <div class="a brands" style="--x:63;--y:619;--w:468">
+    <div class="brand" data-show="brand_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
+    <div class="brand" data-show="brand_adani"><img src="assets/brands/adani.png" alt="Adani Solar" style="width:calc(49*var(--pt))"></div>
+    <div class="brand" data-show="brand_renewsys"><img src="assets/brands/renewsys.png" alt="RenewSys" style="width:calc(64*var(--pt))"></div>
+    <div class="brand" data-show="brand_vikram"><img src="assets/brands/vikram.png" alt="Vikram Solar" style="width:calc(76*var(--pt))"></div>
+    <div class="brand" data-show="brand_tata"><img src="assets/brands/tata-power.png" alt="Tata Power" style="width:calc(48*var(--pt))"></div>
+    <div class="brand" data-show="brand_premier"><img src="assets/brands/premier.png" alt="Premier Energies" style="width:calc(58*var(--pt))"></div>
+  </div>
+  <div class="pnum">PROPOSAL / 02</div>
+</section>
+
+<!-- ========== 3. PROJECT SUMMARY ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <defs><pattern id="dots3" width="7" height="8" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="2" r=".85" fill="#E0E0D1"/></pattern></defs>
+    <image href="assets/art/p3-top.svg" x="380" y="0" width="215.3" height="180"/>
+    <image href="assets/art/p3-bottom.svg" x="440" y="600" width="155.3" height="200"/>
+    <rect x="447" y="680" width="70" height="56" fill="url(#dots3)"/>
+    <line x1="41" y1="166.5" x2="108" y2="166.5" stroke="#98C93E" stroke-width="2"/>
+    <g fill="none" stroke="#B7B2B3" stroke-width=".25"><rect x="48" y="241" width="500" height="176"/><path d="M69 307H522M70 363.3H522"/></g>
+    <image href="assets/art/ic-user.svg" x="70" y="259" width="32" height="32"/>
+    <image href="assets/art/ic-phone.svg" x="70" y="320" width="32" height="32"/>
+    <image href="assets/art/ic-mail.svg" x="70" y="374" width="32" height="33"/>
+    <g fill="none" stroke="#8E8B8C" stroke-width=".25"><rect x="48" y="478" width="500" height="55"/><rect x="48" y="539" width="500" height="55"/><rect x="48" y="600" width="500" height="55"/><rect x="48" y="661" width="500" height="55"/><rect x="48" y="722" width="500" height="55"/></g>
+    <g fill="#F7F9F2" stroke="#BEDB8A" stroke-width="1"><rect x="49" y="478" width="56" height="55"/><rect x="49" y="539" width="56" height="55"/><rect x="49" y="600" width="56" height="55"/><rect x="49" y="661" width="56" height="55"/><rect x="49" y="722" width="56" height="55"/></g>
+    <image href="assets/art/ic-clipboard.svg" x="62" y="488.5" width="30" height="34"/>
+    <image href="assets/art/ic-panel.svg" x="62" y="552.5" width="30" height="28"/>
+    <image href="assets/art/ic-idcard.svg" x="62" y="610.5" width="30" height="34"/>
+    <image href="assets/art/ic-calendar.svg" x="62" y="673" width="30" height="31"/>
+    <image href="assets/art/ic-person.svg" x="62" y="732.5" width="30" height="34"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:45">
+  <div class="t kick" style="--x:125;--y:164;--fs:16">Project Summary</div>
+  <h2 class="t serif b6" style="--x:48;--y:214;--fs:22">Customized For</h2>
+  <div class="t" style="--x:124;--y:266;--fs:13.8" data-f="custName" data-maxx="540"></div>
+  <div class="tl" style="--x:125;--y:285;--fs:10.9;--lh:13;--w:405" data-f="custAddress" data-max="305"></div>
+  <div class="t" style="--x:124;--y:336;--fs:12.8" data-maxx="540">Contact no: <span data-f="custPhone"></span></div>
+  <div class="t" style="--x:124;--y:390;--fs:12.8" data-maxx="540">Mail ID : <span data-f="custEmail"></span></div>
+  <h2 class="t serif green b6" style="--x:49;--y:451;--fs:22">Project details</h2>
+  <div class="t" style="--x:124;--y:495;--fs:11">Prepared by</div>
+  <div class="t" style="--x:124;--y:513;--fs:13" data-f="preparedBy" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:556;--fs:11">Project name</div>
+  <div class="t" style="--x:124;--y:574;--fs:13" data-f="projectNameT" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:617;--fs:11">Project ID</div>
+  <div class="t" style="--x:124;--y:635;--fs:13" data-f="projectId" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:678;--fs:11">Date</div>
+  <div class="t" style="--x:124;--y:696;--fs:13" data-f="dateT"></div>
+  <div class="t" style="--x:124;--y:739;--fs:11">Project Manager</div>
+  <div class="t" style="--x:124;--y:757;--fs:13" data-f="projectManager" data-maxx="540"></div>
+  <div class="pnum">PROPOSAL / 03</div>
+</section>
+
+<!-- ========== 4. SYSTEM CONFIGURATION ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <defs><clipPath id="clipSystem"><path d="M558.3 0C558.3 0 472 23.6 434.2 97.2C434.2 97.2 402.5 137 412.8 198.8C412.8 198.8 428.1 268.7 490.4 278.4C490.4 278.4 557.8 292.5 595.3 259.9L595.3 0Z"/></clipPath></defs>
+    <image href="assets/photo.jpg" x="308" y="-5" width="288" height="287" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipSystem)"/>
+    <image href="assets/art/p4-leaf.svg" x="360" y="0" width="120" height="256"/>
+    <image href="assets/art/p4-panel.svg" x="470" y="298" width="125.3" height="230"/>
+    <line x1="44" y1="106" x2="70" y2="106" stroke="#98C93E" stroke-width="1"/>
+    <image href="assets/art/feat-sun.svg" x="41" y="729" width="41" height="41"/>
+    <image href="assets/art/feat-battery.svg" x="174" y="729" width="41" height="41" data-show="hasBattery"/>
+    <image href="assets/art/feat-grid.svg" x="174" y="729" width="41" height="41" data-show="isOngrid"/>
+    <image href="assets/art/feat-monitor.svg" x="302" y="729" width="41" height="41"/>
+    <image href="assets/art/feat-shield.svg" x="426" y="729" width="41" height="41"/>
+    <path d="M163 732.2V765.8M291 733.7V767.3M414 733.7V767.3" stroke="#58595B" stroke-width=".25"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:39">
+  <div class="t kick" style="--x:77;--y:104.5;--fs:8">System Configuration</div>
+  <h1 class="tl serif" style="--x:40;--y:141;--fs:32;--lh:37;--w:340">Engineered for<br><em class="green">reliable</em> performance.</h1>
+  <p class="tl serif" style="--x:39;--y:209;--fs:10;--lh:17;--w:240;font-style:italic">Every component is selected for durability,<br>efficiency, and long term energy savings</p>
+  <div class="a bomwrap" style="--x:38;--y:246;--w:436">
+    <table class="bomt">
+      <colgroup><col style="width:30.73%"><col style="width:24.08%"><col style="width:30.5%"><col style="width:14.69%"></colgroup>
+      <thead><tr><th>Component</th><th>Brand</th><th>Specification</th><th>Qty</th></tr></thead>
+      <tbody data-render="bom"></tbody>
+    </table>
+  </div>
+  <div class="ab offer" style="--x:38;--b:131.89;--w:435">
+    <div class="offer-title">COMMERCIAL OFFER</div>
+    <div class="orow"><span>System Cost (Before GST)</span><b data-f="costT"></b></div>
+    <div class="orow"><span data-f="gstLabel"></span><b data-f="gstT"></b></div>
+    <div class="oline"></div>
+    <div class="ototal"><span>TOTAL PROJECT COST</span><b data-f="totalT"></b></div>
+    <div class="osub" data-show="hasSubsidy"><span>Less: <span data-f="subsidyLabel"></span> (credited to your bank account) <b data-f="subsidyT"></b></span><span>Net cost after subsidy <b data-f="netCostT"></b></span></div>
+  </div>
+  <div class="tl" style="--x:89;--y:742;--fs:7.9;--lh:12;--w:70">High Efficiency<br>Panels</div>
+  <div class="tl" style="--x:220;--y:742;--fs:7.9;--lh:12;--w:70"><span data-f="feat2a"></span><br><span data-f="feat2b"></span></div>
+  <div class="tl" style="--x:350;--y:742;--fs:7.9;--lh:12;--w:70">Smart Energy<br>Monitoring</div>
+  <div class="tl" style="--x:475;--y:742;--fs:7.9;--lh:12;--w:70"><span data-f="panelWarranty"></span>-Year<br>Warranty</div>
+  <div class="pnum">PROPOSAL / 04</div>
+</section>
+
+<!-- ========== 5. PAYMENT TERMS & GENERAL T&C ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <image href="assets/art/p5-sprig.svg" x="478" y="0" width="117.3" height="280"/>
+    <line x1="39" y1="109.5" x2="65" y2="109.5" stroke="#98C93E" stroke-width="1"/>
+    <rect x="39" y="253" width="221" height="402" rx="12" fill="#10223F"/>
+    <g fill="none" stroke="#A97C50" stroke-width=".5">
+      <rect x="51" y="327" width="186" height="60" rx="12" data-show="pay1On"/>
+      <rect x="51" y="399" width="186" height="61" rx="12" data-show="pay2On"/>
+      <rect x="51" y="471" width="185" height="61" rx="12" data-show="pay3On"/>
+    </g>
+    <g fill="#8CB23F"><circle cx="75" cy="357" r="15" data-show="pay1On"/><circle cx="75" cy="429.5" r="15" data-show="pay2On"/><circle cx="75" cy="501.5" r="15" data-show="pay3On"/></g>
+    <rect x="263" y="338" width="305" height="78" rx="9.6" fill="#FBF8F3"/>
+    <path d="M370 351.4V402.8M470 350.4V401.8" stroke="#A97C50" stroke-width=".25"/>
+    <image href="assets/art/ic-hourglass.svg" x="277" y="357" width="31" height="31"/>
+    <image href="assets/art/ic-useradd.svg" x="380" y="356" width="31" height="31"/>
+    <image href="assets/art/ic-chart.svg" x="478" y="356" width="31" height="31"/>
+    <rect x="266" y="427" width="305" height="225" rx="8.3" fill="#FBF8F3"/>
+    <rect x="277" y="468" width="68" height="155" rx="2.4" fill="#8CB23F"/>
+    <image href="assets/art/ic-amc-shield.svg" x="298" y="482" width="27" height="36"/>
+    <rect x="40" y="684" width="523" height="57" rx="4.2" fill="#102340"/>
+    <image href="assets/art/ic-warranty.svg" x="72" y="692" width="33" height="39"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:37">
+  <div class="t kick" style="--x:70;--y:109.5;--fs:8">Payment Terms &amp; General T&amp;C</div>
+  <h1 class="tl serif b6" style="--x:39;--y:156;--fs:30;--lh:37.5;--w:260">Flexible terms.<br><em class="green">Complete clarity.</em></h1>
+
+  <div class="t serif olive b6" style="--x:287;--y:97.5;--fs:13.8">General T&amp;C</div>
+  <ul class="a ilist tc-list" style="--x:285;--y:129;--w:250" data-edit="tc" contenteditable="true" spellcheck="false" data-max="334">
+    <li><img contenteditable="false" src="assets/art/ic-truck.svg" alt="" style="width:calc(32*var(--pt))"><div>Delivery: The price covers all delivery charges. If you cancel after delivery, you’ll need to cover return delivery fees.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-doc.svg" alt="" style="width:calc(32*var(--pt))"><div>Proposal Validity: This proposal is valid for <span data-f="validDays"></span> days from the date it’s given.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-bulb.svg" alt="" style="width:calc(32*var(--pt))"><div>Net Metering: Your solar system will connect to the grid under the Net Metering Policy. The price we’ve quoted is without Net Meter charges.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-notes.svg" alt="" style="width:calc(32*var(--pt))"><div>Other Charges: Note that fees for KSEB feasibility and registration aren’t included in the quoted price. Electrical Inspectorate charges are also not included in the quoted price.</div></li>
+  </ul>
+
+  <div class="tl" style="--x:313;--y:368;--fs:6.9;--lh:12;--w:55">KSEB<br>Feasibility Fee</div>
+  <div class="t" style="--x:313;--y:399.5;--fs:7.9" data-f="ksebFeasT"></div>
+  <div class="tl" style="--x:419;--y:367;--fs:6.9;--lh:12;--w:48">Registration<br>Fee</div>
+  <div class="t" style="--x:418;--y:399.5;--fs:7.9" data-f="ksebRegT"></div>
+  <div class="tl" style="--x:518;--y:363;--fs:6.9;--lh:10;--w:48">Electrical<br>Inspectorate<br>Charges</div>
+  <div class="t" style="--x:518;--y:399.5;--fs:7.9" data-f="inspectT"></div>
+
+  <div class="t serif olive b6" style="--x:279;--y:446;--fs:12.8">AMC</div>
+  <div class="tl white" style="--x:277;--y:538;--fs:7.9;--lh:19;--w:68;text-align:center">Free <span data-f="amcYears"></span>-Year<br>Maintenance<br>for Your<br>Solar System</div>
+  <ul class="a ilist amc-list" style="--x:353;--y:451;--w:205" data-edit="amc" contenteditable="true" spellcheck="false" data-max="646">
+    <li><img contenteditable="false" src="assets/art/ic-amc-check.svg" alt="" style="width:calc(21*var(--pt))"><div>Annual Check-Up: We’ll visit your solar system once a year.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-amc-shield2.svg" alt="" style="width:calc(21*var(--pt))"><div>Warranty Assistance: We’re here to help with warranty claims.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-amc-search.svg" alt="" style="width:calc(23*var(--pt))"><div>What We Check: During our visit, we’ll inspect electrical components, connections, and the inverter, ensuring everything works efficiently.</div></li>
+    <li><img contenteditable="false" src="assets/art/ic-amc-truck.svg" alt="" style="width:calc(24*var(--pt))"><div>Panel Cleaning: Please note that panel cleaning is not included. You can clean them regularly to maintain efficiency. If you want our cleaning service, there will be an extra charge.</div></li>
+  </ul>
+
+  <div class="t white" style="--x:55;--y:291;--fs:15.8">Payment Terms</div>
+  <div class="t serif white tc b6" style="--x:75;--y:356;--fs:12.8" data-show="pay1On">01</div>
+  <div class="t serif white tc b6" style="--x:75;--y:428.5;--fs:12.8" data-show="pay2On">02</div>
+  <div class="t serif white tc b6" style="--x:75;--y:500.5;--fs:12.8" data-show="pay3On">03</div>
+  <div class="tl white" style="--x:99;--y:350.5;--fs:9.9;--lh:13;--w:134" data-show="pay1On" data-max="385">Pay <span data-f="pay1Pct"></span>% <span data-f="pay1a"></span><br><span data-f="pay1b"></span></div>
+  <div class="tl white" style="--x:99;--y:423;--fs:9.9;--lh:13;--w:134" data-show="pay2On" data-max="458">Pay <span data-f="pay2Pct"></span>% <span data-f="pay2a"></span><br><span data-f="pay2b"></span></div>
+  <div class="tl white" style="--x:99;--y:495;--fs:9.9;--lh:13;--w:134" data-show="pay3On" data-max="530">Pay <span data-f="pay3Pct"></span>% <span data-f="pay3a"></span><br><span data-f="pay3b"></span></div>
+  <div class="tl white" style="--x:54;--y:552;--fs:7.9;--lh:19;--w:196" data-max="650">Late Payment: If your payment is late, a <span data-f="lateFeePct"></span>% monthly fee will apply until it’s paid.<br><span style="display:block;margin-top:calc(5*var(--pt))">Payment Options: You can pay through <span data-f="payModes"></span>.</span></div>
+
+  <div class="t white" style="--x:116;--y:712;--fs:15.8">Warranty</div>
+  <div class="t wlist" style="--x:216;--y:712;--fs:11.8" data-maxx="555">
+    <span><span>Panels :</span> <span data-f="panelWarranty"></span> Years</span>
+    <span><span>Inverter :</span> <span data-f="invWarranty"></span> Years</span>
+    <span data-show="hasBattery"><span>Battery :</span> <span data-f="batteryWarranty"></span> Years</span>
+  </div>
+  <div class="pnum">PROPOSAL / 05</div>
+</section>
+
+<!-- ========== 6. LET'S CONNECT ========== -->
+<section class="page">
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <line x1="41" y1="143.7" x2="68" y2="143.7" stroke="#98C93E" stroke-width="2"/>
+    <image href="assets/art/p6-right.svg" x="470" y="110" width="125.3" height="455"/>
+    <image href="assets/art/p6-dot.svg" x="343" y="556" width="35" height="36"/>
+    <image href="assets/art/p6-bottom.svg" x="45" y="655" width="505" height="140"/>
+    <line x1="328" y1="221.7" x2="511" y2="221.7" stroke="#72923C" stroke-width=".75"/>
+  </svg>
+  <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:35">
+  <div class="t kick" style="--x:76;--y:143;--fs:11.4">Let’s Connect</div>
+  <h1 class="tl serif b6" style="--x:41;--y:194.5;--fs:33;--lh:37;--w:280">Let’s build<br><em class="green">future</em> together.</h1>
+  <p class="tl" style="--x:45;--y:270;--fs:14;--lh:20;--w:275">We’re here to power your tomorrow<br>with clean, reliable and sustainable<br>energy solutions.</p>
+
+  <div class="t olive" style="--x:327;--y:168;--fs:13.8">GST No:</div>
+  <div class="t" style="--x:328;--y:193.5;--fs:13.8" data-f="gstNo"></div>
+  <div class="t olive" style="--x:328;--y:253;--fs:13.8">Bank Account Details:</div>
+  <div class="tl" style="--x:327;--y:284;--fs:9.9;--lh:22;--w:200" data-max="420">
+    <div>Bank : <span data-f="bankName"></span></div>
+    <div>Branch : <span data-f="bankBranch"></span></div>
+    <div>Account Number : <span data-f="bankAcc"></span></div>
+    <div>IFSC Code : <span data-f="bankIfsc"></span></div>
+    <div data-show="hasAccName">Account Name : <span data-f="bankAccName"></span></div>
+    <div data-show="hasUpi">UPI ID : <span data-f="bankUpi"></span></div>
+  </div>
+
+  <div class="a ccard" style="--x:42;--y:403;--w:254" data-max="702">
+    <div class="ct">Future Energies</div>
+    <div class="csep"></div>
+    <div class="crow"><img src="assets/art/ic-pin.svg" alt="" style="width:calc(22*var(--pt))"><div class="pre" data-f="coAddress"></div></div>
+    <div class="csep"></div>
+    <div class="crow" data-show="hasCoPhone"><img src="assets/art/ic-phone-white.svg" alt="" style="width:calc(20*var(--pt))"><div class="pre" data-f="coPhones"></div></div>
+    <div class="crow" data-show="hasCoEmail"><img src="assets/art/ic-mail-white.svg" alt="" style="width:calc(24*var(--pt))"><div data-f="coEmail"></div></div>
+    <div class="crow" data-show="hasCoInsta"><img src="assets/art/ic-insta-white.svg" alt="" style="width:calc(20*var(--pt))"><div data-f="instaT"></div></div>
+  </div>
+  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
+    <ellipse cx="81.5" cy="404" rx="29.5" ry="32" fill="#F8F7ED"/>
+    <image href="assets/art/ic-phone-big.svg" x="62" y="385" width="40" height="38"/>
+    <rect x="130" y="393" width="107" height="32" fill="#222121"/>
+  </svg>
+  <div class="t white tc" style="--x:183.5;--y:409;--fs:13.8">Contact Us</div>
+  <div class="pnum">PROPOSAL / 06</div>
+</section>
+
+</div>
+</main>
+
+<nav class="mobile-bar" aria-label="Sections">
+  <button type="button" data-go="editor"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></svg>Details</button>
+  <button type="button" data-go="preview"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/></svg>Preview</button>
+  <button type="button" data-go="print" class="pdf"><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>Save PDF</button>
+</nav>
+
+<script>
+(() => {
+const STORE = 'fe-proposal-v1';
+const HIST_STORE = 'fe-history-v1';
+const pad = n => String(n).padStart(2, '0');
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+
+const TYPES = ['Hybrid', 'On-grid', 'Off-grid'];
+// Cleared by "New proposal" and never offered as suggestions; everything else is remembered on this device.
+const CUSTOMER_KEYS = ['custName', 'custAddress', 'custPhone', 'custEmail'];
+
+const DEFAULTS = {
+  custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000', custEmail: '',
+  projectId: 'FE26_0001', date: todayISO(), preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
+  systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Solinteg',
+  panelMake: 'Adani TopCon', panelWatt: 620, panelCount: 16, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)',
+  batteryMake: 'Solinteg', batteryCount: 3, batterySpec: '102.4V, 50AH',
+  systemCost: 600000, gstPct: 8.9, subsidyMode: 'none', subsidyCustom: 78000,
+  pay1Pct: 30, pay1a: 'upfront', pay1b: 'when you agree to start',
+  pay2Pct: 60, pay2a: 'after we deliver', pay2b: 'the solar equipment',
+  pay3Pct: 10, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
+  lateFeePct: 1.5, payModes: 'NEFT, cheque or online',
+  ksebFeasibility: '1,000', ksebRegistration: '11,800', inspectorate: 'NIL',
+  amcYears: 5, panelWarranty: 30, invWarranty: 12, batteryWarranty: 10,
+  statSavings: '70-100%', statProjects: '100+',
+  brand_waaree: true, brand_adani: true, brand_renewsys: true, brand_vikram: true, brand_tata: true, brand_premier: true,
+  coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
+  coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
+  gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
+  bankAccName: '', bankUpi: ''
+};
+
+// Bill of materials, one list per system type. Rows of kind panel / inverter / battery / meter / netmeter
+// fill blank cells from the System section.
+const ROW = (component, brand, spec, qty) => ({ kind: 'item', component, brand, spec, qty });
+const AC_DB = ROW('Solar AC DB', 'Finder / Mersen / LK', '1 In 1 Out, IP65', '1 No');
+const SOLAR_DC_DB = ROW('Solar DC DB', 'Finder / Mersen / LK', '1 In 1 Out, IP65, SPD Protection', '1 No');
+const BATTERY_BOX = ROW('Battery Box', 'HV Box', '50AH', '1 No');
+const BOM_TAIL = [
+  ROW('DC Cable', 'Polycab', '4 sq.mm', 'Lot'),
+  ROW('AC Cable', 'Polycab', '6 sq.mm', 'Lot'),
+  ROW('Earthing', 'Excel Earthing', 'Copper Bonded Rod 100 Micron Coating', '3 Nos'),
+  ROW('LA Earthing', 'Excel Earthing', '50 sq.mm Al Down Conductor', 'Required'),
+  ROW('AC Earthing', 'Copper', '10 SWG', 'Required'),
+  ROW('Lightning Arrester', 'Excel Earthing', 'Single Spike 100 Micron Coating', '1 No'),
+  ROW('Mounting Structure', 'TATA GI', 'Custom Design', 'Required'),
+  ROW('Walkway', 'GP Structure', 'Custom Design', 'Required')
+];
+const DEFAULT_BOMS = {
+  'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ROW('Hybrid DC DB', 'Finder / Mersen / LK', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
+    { kind: 'battery' }, BATTERY_BOX, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL],
+  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL],
+  'Off-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'battery' }, BATTERY_BOX, ...BOM_TAIL]
+};
+const BOM_FIELDS = ['component', 'brand', 'spec', 'qty'];
+const nos = n => `${n} ${Number(n) === 1 ? 'No' : 'Nos'}`;
+const AUTO = {
+  panel: v => ({ component: 'Solar Panel', brand: v.panelMake, spec: `${v.panelWatt}Wp ${v.panelTech}`, qty: nos(v.panelCount) }),
+  inverter: v => ({ component: `${v.systemType} inverter`, brand: v.invMake, spec: `${v.kwT}kW ${v.phaseT}`, qty: '1 No' }),
+  battery: v => ({ component: 'Lithium Battery', brand: v.batteryMake, spec: v.batterySpec, qty: nos(v.batteryCount) }),
+  meter: v => ({ component: 'Solar Energy Meter', brand: 'Genus', spec: v.phaseT, qty: '1 No' }),
+  netmeter: v => ({ component: 'Net Meter', brand: 'Genus', spec: v.phaseT, qty: 'Nil' })
+};
+const AUTO_LABEL = { panel: 'Solar panels: from System', inverter: 'Inverter: from System', battery: 'Battery: from System', meter: 'Energy meter: phase from System', netmeter: 'Net meter: phase from System' };
+const normBom = (rows, type) => (Array.isArray(rows) ? rows : DEFAULT_BOMS[type] || DEFAULT_BOMS.Hybrid)
+  .filter(r => r && typeof r === 'object')
+  .map(r => {
+    const o = { kind: AUTO[r.kind] ? r.kind : 'item' };
+    BOM_FIELDS.forEach(f => { o[f] = String(r[f] ?? ''); });
+    return o;
+  });
+const normBoms = boms => Object.fromEntries(TYPES.map(t => [t, normBom(boms && boms[t], t)]));
+const bomCell = (r, a, f) => String(r[f]).trim() || (a[f] ?? '');
+
+// Suggestions offered in the form (customer details are never collected here)
+const SUGGEST = {
+  panelMake: ['Adani TopCon', 'Waaree', 'Vikram Solar', 'Tata Power', 'Premier Energies', 'RenewSys'],
+  invMake: ['Solinteg', 'Deye', 'Growatt', 'Sungrow', 'Havells'],
+  batteryMake: ['Solinteg', 'Deye'],
+  'bom.component': [...new Set(Object.values(DEFAULT_BOMS).flat().map(r => r.component).filter(Boolean))],
+  'bom.brand': [...new Set(Object.values(DEFAULT_BOMS).flat().map(r => r.brand).filter(Boolean))],
+  'bom.spec': [],
+  'bom.qty': ['1 No', '2 Nos', '3 Nos', 'Lot', 'Required', 'Nil']
+};
+
+let state = { ...DEFAULTS, boms: normBoms() };
+let edits = {};
+let hist = {};
+const original = {};
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '₹ ' + Math.round(n).toLocaleString('en-IN') + '/-';
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const kw = n => String(Math.round(n * 100) / 100);
+const fmtDate = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const fee = x => { const t = String(x ?? '').trim(); return !t ? 'NIL' : /^[\d,.\s]+$/.test(t) ? `${t}/-` : t; };
+const bom = () => state.boms[state.systemType] || (state.boms[state.systemType] = normBom(null, state.systemType));
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (saved) { state = { ...DEFAULTS, ...saved.state }; edits = saved.edits || {}; }
+  } catch (e) { /* storage unavailable: run with defaults */ }
+  if (!TYPES.includes(state.systemType)) state.systemType = DEFAULTS.systemType;
+  state.boms = normBoms(state.boms);
+  try { hist = JSON.parse(localStorage.getItem(HIST_STORE) || '{}') || {}; } catch (e) { hist = {}; }
+}
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify({ state, edits })); } catch (e) { /* ignore */ }
+}
+
+// ---------- Remembered values, offered as suggestions next time ----------
+function remember(key, value) {
+  const v = String(value ?? '').trim();
+  if (!v || v.length > 120) return;
+  hist[key] = [v, ...(hist[key] || []).filter(x => x !== v)].slice(0, 15);
+  try { localStorage.setItem(HIST_STORE, JSON.stringify(hist)); } catch (e) { /* ignore */ }
+  fillDatalist(key);
+}
+function fillDatalist(key) {
+  const id = 'dl-' + key.replace(/\W/g, '-');
+  let dl = document.getElementById(id);
+  if (!dl) { dl = document.createElement('datalist'); dl.id = id; document.body.appendChild(dl); }
+  const opts = [...new Set([...(hist[key] || []), ...(SUGGEST[key] || [])])];
+  dl.innerHTML = opts.map(o => `<option value="${esc(o)}">`).join('');
+  return id;
+}
+function wireDatalists() {
+  $$('[data-hist]').forEach(el => el.setAttribute('list', fillDatalist(el.dataset.hist)));
+  BOM_FIELDS.forEach(f => fillDatalist('bom.' + f));
+}
+
+function derive(s) {
+  const n = k => Number(s[k]) || 0;
+  const v = { ...s };
+  v.kwT = kw(n('invKw'));
+  v.dcKwp = n('panelCount') * n('panelWatt') / 1000;
+  v.phaseT = s.phase === 'Single phase' ? '1 Phase' : '3 Phase';
+  v.isOngrid = s.systemType === 'On-grid';
+  v.hasBattery = !v.isOngrid;
+  v.projectNameT = String(s.projectName).trim() || `${v.kwT}kW rooftop ${s.systemType.toLowerCase()} solar system`;
+  v.feat2a = v.isOngrid ? 'Net Metering' : s.systemType === 'Hybrid' ? 'Hybrid Battery' : 'Battery Power';
+  v.feat2b = v.isOngrid ? 'Savings' : 'Backup';
+
+  // Commercial offer
+  v.cost = Math.round(n('systemCost'));
+  v.gst = Math.round(v.cost * n('gstPct') / 100);
+  v.total = v.cost + v.gst;
+  v.costT = money(v.cost); v.gstT = money(v.gst); v.totalT = money(v.total);
+  v.gstLabel = `GST (${Math.round(n('gstPct') * 100) / 100}%)`;
+  let sub = 0;
+  if (s.subsidyMode === 'auto') {
+    // PM Surya Ghar: ₹30,000/kW up to 2 kW, ₹18,000 for the 3rd kW, capped at ₹78,000
+    const c = v.dcKwp;
+    sub = Math.min(78000, Math.round(Math.min(c, 2) * 30000 + Math.max(0, Math.min(c, 3) - 2) * 18000));
+  } else if (s.subsidyMode === 'custom') sub = n('subsidyCustom');
+  v.subsidy = sub; v.hasSubsidy = sub > 0;
+  v.subsidyLabel = s.subsidyMode === 'auto' ? 'PM Surya Ghar subsidy' : 'Subsidy';
+  v.subsidyT = money(sub); v.netCostT = money(v.total - sub);
+
+  // Payment terms
+  [1, 2, 3].forEach(i => { v[`pay${i}On`] = n(`pay${i}Pct`) > 0; });
+  v.paySum = n('pay1Pct') + n('pay2Pct') + n('pay3Pct');
+
+  // Charges, cover
+  v.ksebFeasT = fee(s.ksebFeasibility); v.ksebRegT = fee(s.ksebRegistration); v.inspectT = fee(s.inspectorate);
+  const proj = String(s.statProjects).trim();
+  v.statProjNum = proj.replace(/\+$/, ''); v.statProjPlus = proj.endsWith('+') ? '+' : '';
+
+  // Dates
+  const d = s.date ? new Date(s.date + 'T00:00:00') : new Date();
+  v.dateT = fmtDate(d);
+
+  // Company
+  v.coPhones = [s.coPhone1, s.coPhone2].map(x => String(x).trim()).filter(Boolean).join('\n');
+  v.hasCoPhone = !!v.coPhones;
+  v.hasCoEmail = !!String(s.coEmail).trim();
+  const insta = String(s.coInsta).trim();
+  const m = insta.match(/instagram\.com\/([^/?#]+)/i);
+  v.instaT = m ? '@' + m[1] : insta;
+  v.hasCoInsta = !!insta;
+  v.hasAccName = !!String(s.bankAccName).trim();
+  v.hasUpi = !!String(s.bankUpi).trim();
+  return v;
+}
+
+// ---------- Renderers ----------
+function render(v) {
+  const R = {};
+  R.bom = bom().map(r => {
+    const a = AUTO[r.kind] ? AUTO[r.kind](v) : {};
+    const c = f => bomCell(r, a, f);
+    if (!c('component') && !c('brand') && !c('spec')) return '';
+    return `<tr><td>${esc(c('component'))}</td><td>${esc(c('brand'))}</td><td>${esc(c('spec'))}</td><td>${esc(c('qty'))}</td></tr>`;
+  }).join('');
+  return R;
+}
+
+function update() {
+  const v = derive(state);
+  $$('[data-f]').forEach(el => {
+    const val = v[el.dataset.f];
+    const txt = val === undefined || val === null ? '' : String(val);
+    if (el.textContent !== txt) el.textContent = txt;
+  });
+  $$('[data-show]').forEach(el => { el.style.display = v[el.dataset.show] ? '' : 'none'; });
+  const R = render(v);
+  $$('[data-render]').forEach(el => { el.innerHTML = R[el.dataset.render] || ''; });
+
+  // Editor helpers
+  $$('[data-when]').forEach(el => {
+    const [, k, op, val] = el.dataset.when.match(/^(\w+)(!?=)(.*)$/);
+    el.style.display = (String(state[k]) === val) === (op === '=') ? '' : 'none';
+  });
+  $$('[data-type-label]').forEach(el => { el.textContent = state.systemType; });
+  const ratio = v.dcKwp / (Number(state.invKw) || 1);
+  bomPlaceholders(v);
+  $('[data-hint="system"]').innerHTML = `Panel capacity <b>${esc(kw(v.dcKwp))} kWp</b> · DC/AC ratio ${ratio.toFixed(2)}<br>Project name: ${esc(v.projectNameT)}`;
+  $('[data-hint="price"]').innerHTML = `GST ${inr(v.gst)} · <b>Total ${inr(v.total)}</b>` +
+    (v.hasSubsidy ? `<br>Subsidy ${inr(v.subsidy)} · After subsidy ${inr(v.total - v.subsidy)}` : '') +
+    (v.dcKwp ? `<br>${inr(v.total / v.dcKwp)} per kWp including GST` : '');
+  const amt = i => inr(v.total * (Number(state[`pay${i}Pct`]) || 0) / 100);
+  $('[data-hint="pay"]').innerHTML = `Step 1 ${amt(1)} · Step 2 ${amt(2)} · Step 3 ${amt(3)}<br>Total ${v.paySum}%`;
+
+  const w = [];
+  if (v.dcKwp && (ratio < 0.8 || ratio > 1.5)) w.push(`DC/AC ratio is ${ratio.toFixed(2)}. Check the panel count against the inverter size.`);
+  if (v.paySum !== 100) w.push(`The payment steps add up to ${v.paySum}%, not 100%.`);
+  if (!String(state.bankAcc).trim() || !String(state.bankIfsc).trim()) w.push({ info: true, t: 'Add the bank account number and IFSC (Company & bank details) before sending.' });
+  setTimeout(() => {
+    const over = checkFit();
+    const list = over.length ? [...w, `Page ${over.join(', ')} has too much content to fit. Remove some items or shorten the text.`] : w;
+    $('#warnings').innerHTML = list.map(x => typeof x === 'string'
+      ? `<div class="warn">${esc(x)}</div>` : `<div class="warn info">${esc(x.t)}</div>`).join('');
+  }, 0);
+}
+
+// Marks pages whose content runs past its space (limits are in points from the top / left of the page)
+function checkFit() {
+  const over = [];
+  $$('.page').forEach((pg, i) => {
+    const pr = pg.getBoundingClientRect();
+    if (!pr.height) return;
+    const k = 841.89 / pr.height;
+    const top = el => (el.getBoundingClientRect().top - pr.top) * k;
+    const bottom = el => (el.getBoundingClientRect().bottom - pr.top) * k;
+    const right = el => (el.getBoundingClientRect().right - pr.left) * k;
+    let bad = false;
+    pg.querySelectorAll('[data-max]').forEach(el => { if (el.getClientRects().length && bottom(el) > Number(el.dataset.max) + .5) bad = true; });
+    pg.querySelectorAll('[data-maxx]').forEach(el => { if (el.getClientRects().length && right(el) > Number(el.dataset.maxx) + .5) bad = true; });
+    const tbl = pg.querySelector('.bomwrap'), offer = pg.querySelector('.offer');
+    if (tbl && offer) {
+      tbl.classList.remove('tight');
+      if (bottom(tbl) > top(offer) - 6) {
+        tbl.classList.add('tight');
+        if (bottom(tbl) > top(offer) - 4) bad = true;
+      }
+    }
+    pg.classList.toggle('overflow', bad);
+    if (bad) over.push(i + 1);
+  });
+  return over;
+}
+
+const BOM_PH = { component: 'Component', brand: 'Brand', spec: 'Specification', qty: 'Qty' };
+function renderBomEditor() {
+  const rows = bom(), last = rows.length - 1;
+  $('#bomList').innerHTML = rows.map((r, i) => `
+    <div class="bom-row${AUTO[r.kind] ? ' auto' : ''}" data-i="${i}">
+      <div class="bom-head">
+        <span class="bom-n">${i + 1}</span>
+        <span class="bom-kind">${AUTO_LABEL[r.kind] || ''}</span>
+        <div class="bom-ctrl">
+          <button type="button" data-act="up" title="Move up" aria-label="Move item ${i + 1} up"${i === 0 ? ' disabled' : ''}>↑</button>
+          <button type="button" data-act="down" title="Move down" aria-label="Move item ${i + 1} down"${i === last ? ' disabled' : ''}>↓</button>
+          <button type="button" data-act="del" title="Remove" aria-label="Remove item ${i + 1}">✕</button>
+        </div>
+      </div>
+      <div class="bom-grid">
+        ${['component', 'qty', 'brand', 'spec'].map(f => `<input data-bf="${f}" list="dl-bom-${f}" value="${esc(r[f])}" placeholder="${BOM_PH[f]}" aria-label="${BOM_PH[f]}, item ${i + 1}">`).join('')}
+      </div>
+    </div>`).join('');
+  bomPlaceholders(derive(state));
+}
+function bomPlaceholders(v) {
+  $$('#bomList .bom-row').forEach(row => {
+    const r = bom()[+row.dataset.i];
+    if (!r || !AUTO[r.kind]) return;
+    const a = AUTO[r.kind](v);
+    row.querySelectorAll('[data-bf]').forEach(inp => { inp.placeholder = a[inp.dataset.bf] || BOM_PH[inp.dataset.bf]; });
+  });
+}
+
+function fillForm() {
+  $$('[data-k]').forEach(el => {
+    const val = state[el.dataset.k];
+    if (el.type === 'checkbox') el.checked = !!val; else el.value = val ?? '';
+  });
+}
+function applyEdits() {
+  $$('[data-edit]').forEach(el => { el.innerHTML = edits[el.dataset.edit] ?? original[el.dataset.edit]; });
+}
+
+function onField(e) {
+  const el = e.target;
+  if (!el.dataset || !el.dataset.k) return;
+  const k = el.dataset.k;
+  state[k] = el.type === 'checkbox' ? el.checked : (el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value);
+  if (k === 'systemType') renderBomEditor();
+  update(); save();
+}
+document.addEventListener('input', e => {
+  const ed = e.target.closest && e.target.closest('[data-edit]');
+  if (ed) { edits[ed.dataset.edit] = ed.innerHTML; save(); update(); return; }
+  const bf = e.target.dataset && e.target.dataset.bf;
+  if (bf) {
+    const r = bom()[+e.target.closest('.bom-row').dataset.i];
+    if (r) { r[bf] = e.target.value; update(); save(); }
+    return;
+  }
+  onField(e);
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.hist) remember(el.dataset.hist, el.value);
+  if (el.dataset && el.dataset.bf) remember('bom.' + el.dataset.bf, el.value);
+  if (el.dataset && el.dataset.k) onField(e);
+});
+$('#bomList').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-act]'); if (!btn) return;
+  const i = +btn.closest('.bom-row').dataset.i, b = bom();
+  const act = btn.dataset.act;
+  let focusRow = i;
+  if (act === 'del') {
+    const a = AUTO[b[i].kind] ? AUTO[b[i].kind](derive(state)) : {};
+    const name = bomCell(b[i], a, 'component') || 'this item';
+    if (!confirm(`Remove "${name}" from the bill of materials?`)) return;
+    b.splice(i, 1);
+    focusRow = Math.min(i, b.length - 1);
+  } else {
+    const j = act === 'up' ? i - 1 : i + 1;
+    if (j < 0 || j >= b.length) return;
+    [b[i], b[j]] = [b[j], b[i]];
+    focusRow = j;
+  }
+  renderBomEditor(); update(); save();
+  const target = $(`#bomList .bom-row[data-i="${focusRow}"] button[data-act="${act}"]`);
+  if (target && !target.disabled) target.focus();
+});
+$('#bomAdd').addEventListener('click', () => {
+  bom().push({ kind: 'item', component: '', brand: '', spec: '', qty: '1 No' });
+  renderBomEditor(); update(); save();
+  const rows = $$('#bomList .bom-row');
+  rows[rows.length - 1].querySelector('[data-bf="component"]').focus();
+});
+$('#bomReset').addEventListener('click', () => {
+  if (!confirm(`Replace the ${state.systemType} bill of materials with the default list? Your changes to it will be lost.`)) return;
+  state.boms[state.systemType] = normBom(null, state.systemType);
+  renderBomEditor(); update(); save();
+});
+
+// Fit pages to the preview width
+function fit() {
+  const avail = $('#preview').clientWidth - 48;
+  const pagePx = 210 * 96 / 25.4;
+  document.documentElement.style.setProperty('--z', Math.min(1, avail / pagePx).toFixed(3));
+}
+window.addEventListener('resize', () => { fit(); update(); });
+
+function getPdfFileName() {
+  const v = derive(state);
+  const name = String(state.custName || '').trim() || 'Future Energies Proposal';
+  const sys = v.kwT && v.kwT !== '0' ? `${v.kwT}kW ${state.systemType}` : '';
+  const id = String(state.projectId || '').trim();
+  return [name, sys, id].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, '-');
+}
+
+// Actions
+$('#btnPrint').addEventListener('click', () => {
+  const t = document.title;
+  document.title = getPdfFileName();
+  window.print();
+  setTimeout(() => { document.title = t; }, 1000);
+});
+window.addEventListener('beforeprint', () => { document.title = getPdfFileName(); });
+$('#btnNew').addEventListener('click', () => {
+  if (!confirm('Start a new proposal? The customer details are cleared and the project ID goes up by one. Everything else is kept.')) return;
+  const m = String(state.projectId).match(/^(.*?)(\d+)(\D*)$/);
+  if (m) state.projectId = m[1] + String(Number(m[2]) + 1).padStart(m[2].length, '0') + m[3];
+  CUSTOMER_KEYS.forEach(k => { state[k] = ''; });
+  state.date = todayISO();
+  fillForm(); update(); save();
+  const first = $('[data-k="custName"]');
+  first.closest('details').open = true;
+  first.focus();
+});
+$('#btnExport').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ app: 'fe-proposal', version: 1, state, edits }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${getPdfFileName()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('#btnImport').addEventListener('click', () => $('#fileImport').click());
+$('#fileImport').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || data.app !== 'fe-proposal' || typeof data.state !== 'object') throw new Error('bad file');
+    state = { ...DEFAULTS, ...data.state };
+    if (!TYPES.includes(state.systemType)) state.systemType = DEFAULTS.systemType;
+    state.boms = normBoms(state.boms);
+    edits = data.edits && typeof data.edits === 'object' ? data.edits : {};
+    fillForm(); renderBomEditor(); applyEdits(); update(); save();
+  } catch (err) { alert('That file is not a Future Energies proposal file.'); }
+  e.target.value = '';
+});
+$('#btnResetText').addEventListener('click', e => {
+  e.preventDefault();
+  if (!confirm('Put all directly edited text back to the template wording?')) return;
+  edits = {}; applyEdits(); update(); save();
+});
+
+// Init
+$$('[data-edit]').forEach(el => { original[el.dataset.edit] = el.innerHTML; });
+load();
+wireDatalists();
+fillForm();
+renderBomEditor();
+applyEdits();
+fit();
+update();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
+window.addEventListener('load', update);
+
+$$('.mobile-bar [data-go]').forEach(b => b.addEventListener('click', () => {
+  const go = b.dataset.go;
+  if (go === 'print') { $('#btnPrint').click(); return; }
+  (go === 'editor' ? $('.editor') : $('#preview')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+
+// ---------- Installable app (iPhone, Android, Desktop, Laptop) ----------
+const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let installPrompt = null;
+
+function hideAllInstallUI() {
+  const topBtn = $('#topInstallBtn');
+  const edBtn = $('#btnInstall');
+  if (topBtn) topBtn.style.display = 'none';
+  if (edBtn) edBtn.style.display = 'none';
+}
+if (standalone) hideAllInstallUI();
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+});
+window.addEventListener('appinstalled', () => {
+  installPrompt = null;
+  hideAllInstallUI();
+});
+
+async function handleInstall() {
+  if (installPrompt) {
+    installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') hideAllInstallUI();
+    installPrompt = null;
+    return;
+  }
+  openInstallModal();
+}
+$('#topInstallBtn')?.addEventListener('click', handleInstall);
+$('#btnInstall')?.addEventListener('click', handleInstall);
+
+function openInstallModal() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isMac = /macintosh|mac os x/i.test(navigator.userAgent) && !isIOS;
+  const step = (n, html) => `<div class="im-step"><div class="im-step-n">${n}</div><div class="im-step-txt">${html}</div></div>`;
+
+  let title, desc, stepsHtml;
+  if (isIOS) {
+    title = 'Install on iPhone / iPad';
+    desc = 'Add the proposal builder to your Home Screen to use it full-screen like an app.';
+    stepsHtml = step(1, 'In <b>Safari</b>, tap the <b>Share</b> button at the bottom of your screen.') +
+      step(2, 'Scroll down the menu and tap <b>Add to Home Screen</b>.') +
+      step(3, 'Tap <b>Add</b> in the top right corner.<span class="sub">The FE Proposals icon now appears on your home screen.</span>');
+  } else if (isAndroid) {
+    title = 'Install on Android';
+    desc = 'Install the proposal builder on your phone for quick offline access.';
+    stepsHtml = step(1, 'Tap the <b>three dots menu (⋮)</b> in the top right corner of Chrome.') +
+      step(2, 'Tap <b>Install app</b> or <b>Add to Home screen</b>.') +
+      step(3, 'Tap <b>Install</b> to confirm.');
+  } else if (isMac) {
+    title = 'Install on Mac';
+    desc = 'Install the proposal builder as an app on macOS.';
+    stepsHtml = step(1, '<b>In Chrome or Edge:</b> click the <b>Install</b> icon on the right side of the address bar, or Menu (⋮) → <b>Save and share</b> → <b>Install Future Energies Proposal Builder</b>.') +
+      step(2, '<b>In Safari:</b> choose <b>File</b> in the top menu bar → <b>Add to Dock</b>.');
+  } else {
+    title = 'Install on Desktop / Laptop';
+    desc = 'Use the proposal builder as an installed desktop app.';
+    stepsHtml = step(1, 'Look for the <b>Install app icon</b> on the right side of the browser address bar.') +
+      step(2, 'Or open the <b>browser menu (⋮ or …)</b> → <b>Save and share</b> or <b>Apps</b> → <b>Install Future Energies Proposal Builder</b>.') +
+      step(3, 'Click <b>Install</b>. The app opens in its own window with a desktop shortcut.');
+  }
+
+  let modalEl = $('#installModal');
+  if (!modalEl) {
+    modalEl = document.createElement('div');
+    modalEl.id = 'installModal';
+    modalEl.className = 'install-modal-backdrop';
+    document.body.appendChild(modalEl);
+    modalEl.addEventListener('click', e => { if (e.target === modalEl) closeInstallModal(); });
+  }
+  modalEl.innerHTML = `
+    <div class="install-modal" role="dialog" aria-modal="true" aria-labelledby="imTitle">
+      <div class="im-head">
+        <img class="im-icon" src="icons/icon-192.png" alt="">
+        <div class="im-title"><h3 id="imTitle">${esc(title)}</h3><p>${esc(desc)}</p></div>
+        <button class="im-close" type="button" aria-label="Close" id="imCloseBtn">✕</button>
+      </div>
+      <div class="im-body">${stepsHtml}</div>
+      <div class="im-foot"><button class="btn primary" type="button" id="imGotItBtn">Got it</button></div>
+    </div>`;
+  modalEl.style.display = 'flex';
+  $('#imCloseBtn')?.addEventListener('click', closeInstallModal);
+  $('#imGotItBtn')?.addEventListener('click', closeInstallModal);
+}
+function closeInstallModal() {
+  const modalEl = $('#installModal');
+  if (modalEl) modalEl.style.display = 'none';
+}
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallModal(); });
+
+// Offline support (only over https / localhost, not when opened as a file)
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+})();
+</script>
+</body>
+</html>
