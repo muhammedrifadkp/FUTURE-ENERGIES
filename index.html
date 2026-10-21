@@ -57,6 +57,7 @@
 }
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%} /* stop iPhones enlarging the small proposal text */
 body{font-family:var(--sans);color:var(--ui-ink);background:var(--desk);display:grid;grid-template-columns:var(--side,370px) 1fr;height:100vh;overflow:hidden}
 
 /* ---------- Editor ---------- */
@@ -97,10 +98,11 @@ body.resizing .preview{pointer-events:none}
 .pdf-bar i{display:block;height:100%;width:0;background:var(--olive);transition:width .2s}
 /* the copy of the pages that is drawn into the PDF */
 .pdf-export .pages{zoom:1!important}
-.pdf-export .page{box-shadow:none}
-.pdf-export .page.overflow::after{display:none}
-.pdf-export [data-bind]:empty::before{content:none}
+.pdf-export .page{box-shadow:none;background:transparent} /* the artwork is drawn underneath separately */
 .pdf-export [data-edit],.pdf-export [data-bind]{outline:none!important}
+/* html2canvas copies ::before/::after from the live page, so on-screen-only labels are switched off there while capturing */
+.pdf-capturing .page.overflow::after{display:none}
+.pdf-capturing [data-bind]:empty::before{content:none}
 
 /* Top right install button (all views) */
 .top-install-btn{position:fixed;top:14px;right:18px;z-index:999;display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:1px solid var(--navy-d);border-radius:999px;padding:8px 15px;font:600 12.5px/1 var(--sans);cursor:pointer;box-shadow:0 3px 12px rgba(34,58,115,.28);transition:all .18s ease;user-select:none}
@@ -697,11 +699,10 @@ details.grp[open]>summary::after{content:"–"}
     <div class="crow" data-show="hasCoEmail"><img src="assets/art/ic-mail-white.svg" alt="" style="width:calc(24*var(--pt))"><div data-f="coEmail"></div></div>
     <div class="crow" data-show="hasCoInsta"><img src="assets/art/ic-insta-white.svg" alt="" style="width:calc(20*var(--pt))"><div data-f="instaT"></div></div>
   </div>
-  <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
-    <ellipse cx="81.5" cy="404" rx="29.5" ry="32" fill="#F8F7ED"/>
-    <image href="assets/art/ic-phone-big.svg" x="62" y="385" width="40" height="38"/>
-    <rect x="130" y="393" width="107" height="32" fill="#222121"/>
-  </svg>
+  <!-- on top of the card, so these are page elements (each page keeps a single artwork layer underneath) -->
+  <div class="a" style="--x:52;--y:372;--w:59;height:calc(64*var(--pt));border-radius:50%;background:#F8F7ED"></div>
+  <img class="a" src="assets/art/ic-phone-big.svg" alt="" style="--x:62;--y:385;--w:40">
+  <div class="a" style="--x:130;--y:393;--w:107;height:calc(32*var(--pt));background:#222121"></div>
   <div class="t white tc" style="--x:183.5;--y:409;--fs:13.8">Contact Us</div>
   <div class="pnum">PROPOSAL / 06</div>
 </section>
@@ -1327,25 +1328,55 @@ function makePdf(images, title) {
   return new Blob(parts, { type: 'application/pdf' });
 }
 
+// The page's artwork layer as one standalone SVG image at the exact output size.
+// Drawn by the browser itself: html2canvas misplaced it on iPhones.
+function artImage(svg, embedded, W, H) {
+  const copy = svg.cloneNode(true);
+  copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  copy.setAttribute('width', W);
+  copy.setAttribute('height', H);
+  copy.setAttribute('preserveAspectRatio', 'none');
+  copy.removeAttribute('class');
+  // an SVG drawn as an image can't load other files, so the artwork and photos are embedded
+  copy.querySelectorAll('image').forEach(im => { const h = im.getAttribute('href'); if (embedded[h]) im.setAttribute('href', embedded[h]); });
+  const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(copy));
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => setTimeout(() => resolve(img), 60); // give Safari a moment to decode the embedded images
+    img.onerror = () => reject(new Error('artwork did not load'));
+    img.src = src;
+  });
+}
+
 async function buildPdf(onProgress) {
   await loadHtml2canvas();
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
-  // An SVG drawn as an image can't load other files, so the artwork and photos are embedded first
-  const hrefs = [...new Set($$('.page svg image').map(im => im.getAttribute('href')))];
+  const hrefs = [...new Set($$('.page svg.art image').map(im => im.getAttribute('href')))];
   const embedded = Object.fromEntries(await Promise.all(hrefs.map(async h => [h, await toDataUrl(h)])));
+  const W = Math.round(210 * 96 / 25.4 * PDF_SCALE), H = Math.round(297 * 96 / 25.4 * PDF_SCALE);
   const pages = $$('.page');
   const images = [];
   for (let i = 0; i < pages.length; i++) {
     onProgress(i, pages.length);
-    const canvas = await window.html2canvas(pages[i], {
-      scale: PDF_SCALE, backgroundColor: '#ffffff', logging: false, windowWidth: 1400, windowHeight: 1000,
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+    // 1. artwork underneath
+    for (const svg of pages[i].querySelectorAll('svg.art')) ctx.drawImage(await artImage(svg, embedded, W, H), 0, 0, W, H);
+    // 2. text, boxes and pictures on top, drawn by html2canvas without the artwork
+    const top = await window.html2canvas(pages[i], {
+      scale: PDF_SCALE, backgroundColor: null, logging: false, windowWidth: 1400, windowHeight: 1000,
       onclone: doc => {
         doc.documentElement.classList.add('pdf-export');
-        doc.querySelectorAll('.page svg image').forEach(im => { const h = im.getAttribute('href'); if (embedded[h]) im.setAttribute('href', embedded[h]); });
+        doc.querySelectorAll('.page svg.art').forEach(s => s.remove());
       }
     });
+    ctx.drawImage(top, 0, 0, W, H);
+    top.width = top.height = 0;
     const jpeg = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', PDF_QUALITY));
-    images.push({ bytes: new Uint8Array(await jpeg.arrayBuffer()), w: canvas.width, h: canvas.height });
+    images.push({ bytes: new Uint8Array(await jpeg.arrayBuffer()), w: W, h: H });
     canvas.width = canvas.height = 0; // free the memory straight away on phones
   }
   onProgress(pages.length, pages.length);
@@ -1373,11 +1404,13 @@ $('#btnPdf').addEventListener('click', async () => {
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   update();
   const modal = pdfDialog('<h3 id="pdfTitle">Creating PDF…</h3><p id="pdfStep">Preparing the pages</p><div class="pdf-bar"><i id="pdfFill"></i></div>', true);
+  document.documentElement.classList.add('pdf-capturing');
   try {
     const blob = await buildPdf((done, total) => {
       $('#pdfStep').textContent = done < total ? `Page ${done + 1} of ${total}` : 'Finishing the file';
       $('#pdfFill').style.width = `${Math.round(done / total * 100)}%`;
     });
+    document.documentElement.classList.remove('pdf-capturing');
     const name = `${getPdfFileName()}.pdf`;
     const file = typeof File === 'function' ? new File([blob], name, { type: 'application/pdf' }) : null;
     const phone = window.matchMedia('(pointer: coarse)').matches;
@@ -1398,6 +1431,7 @@ $('#btnPdf').addEventListener('click', async () => {
     pdfDialog('<h3 id="pdfTitle">Couldn’t create the PDF</h3><p>Please try again. If it keeps failing, reload the app.</p><div class="btns"><button class="btn primary" type="button" id="pdfClose">Close</button></div>');
     $('#pdfClose').addEventListener('click', () => { $('#pdfModal').style.display = 'none'; });
   } finally {
+    document.documentElement.classList.remove('pdf-capturing');
     pdfBusy = false;
   }
 });
