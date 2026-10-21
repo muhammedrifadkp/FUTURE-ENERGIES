@@ -57,10 +57,19 @@
 }
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{margin:0}
-body{font-family:var(--sans);color:var(--ui-ink);background:var(--desk);display:grid;grid-template-columns:370px 1fr;height:100vh;overflow:hidden}
+body{font-family:var(--sans);color:var(--ui-ink);background:var(--desk);display:grid;grid-template-columns:var(--side,370px) 1fr;height:100vh;overflow:hidden}
 
 /* ---------- Editor ---------- */
-.editor{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.editor{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
+/* drag handle on the panel edge: drag to resize, double-click to reset */
+.resizer{position:absolute;top:0;bottom:0;right:-6px;width:12px;cursor:col-resize;z-index:20;touch-action:none}
+.resizer::after{content:"";position:absolute;top:0;bottom:0;left:5px;width:2px;background:transparent;transition:background .15s}
+.resizer::before{content:"";position:absolute;top:50%;left:3px;width:6px;height:36px;margin-top:-18px;border-radius:3px;background:#C9CFDA;transition:background .15s}
+.resizer:hover::after,.resizer:focus-visible::after,body.resizing .resizer::after{background:var(--lime)}
+.resizer:hover::before,.resizer:focus-visible::before,body.resizing .resizer::before{background:var(--olive)}
+.resizer:focus-visible{outline:none}
+body.resizing{cursor:col-resize;user-select:none}
+body.resizing .preview{pointer-events:none}
 .ed-head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
 .ed-head img{height:34px;display:block}
 .ed-head h1{font:600 15px/1.3 var(--sans);margin:10px 0 2px}
@@ -147,6 +156,12 @@ details.grp[open]>summary::after{content:"–"}
 .bom-grid input::placeholder{color:#98A1B0}
 .bom-grid input:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .bom-actions{display:flex;gap:6px;flex-wrap:wrap}
+.wr-row{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;align-items:center;margin-bottom:6px}
+.wr-row input{font:400 12.5px var(--sans);color:var(--ui-ink);border:1px solid var(--line);border-radius:6px;padding:6px 7px;min-width:0;width:100%;background:#fff}
+.wr-row input:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.wr-row button{height:28px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-size:12px;color:var(--ui-ink-2);padding:0}
+.wr-row button:hover{border-color:var(--danger);color:var(--danger)}
+.wr-head{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;font-size:11px;color:var(--muted);margin-bottom:4px}
 
 /* ---------- Preview ---------- */
 .preview{overflow:auto;padding:28px 24px 60px;min-width:0}
@@ -156,9 +171,10 @@ details.grp[open]>summary::after{content:"–"}
 .page h1,.page h2,.page p,.page ul{margin:0;padding:0;font-weight:400}
 .page ul{list-style:none}
 .page em{font-style:italic}
-[data-edit]{border-radius:calc(4*var(--pt));transition:outline-color .15s}
-[data-edit]:hover{outline:1px dashed #A9C77A;outline-offset:calc(3*var(--pt))}
-[data-edit]:focus{outline:1.5px solid var(--lime);outline-offset:calc(3*var(--pt))}
+[data-edit],[data-bind]{border-radius:calc(4*var(--pt));transition:outline-color .15s}
+[data-edit]:hover,[data-bind]:hover{outline:1px dashed #A9C77A;outline-offset:calc(3*var(--pt))}
+[data-edit]:focus,[data-bind]:focus{outline:1.5px solid var(--lime);outline-offset:calc(3*var(--pt))}
+[data-bind]:empty::before{content:attr(data-ph);color:#B4BAC4}
 
 /* positioning helpers (values in points) */
 .art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
@@ -182,7 +198,7 @@ details.grp[open]>summary::after{content:"–"}
 .stat-lbl{letter-spacing:.07em}
 
 /* 2. about */
-.brands{display:flex;flex-wrap:wrap;justify-content:center;gap:calc(20*var(--pt)) calc(58.5*var(--pt))}
+.brands{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;height:calc(144*var(--pt));gap:calc(20*var(--pt)) calc(58.5*var(--pt))}
 .brand{width:calc(117*var(--pt));height:calc(62*var(--pt));border:calc(1*var(--pt)) solid var(--ink);border-radius:calc(12*var(--pt));display:flex;align-items:center;justify-content:center}
 .brand img{display:block;height:auto}
 
@@ -219,8 +235,11 @@ details.grp[open]>summary::after{content:"–"}
 .amc-list li{grid-template-columns:calc(25*var(--pt)) 1fr;margin-bottom:calc(18*var(--pt))}
 .amc-list li:last-child{margin-bottom:0}
 .amc-list li>div{padding-top:calc(4*var(--pt))}
-.wlist{display:flex;gap:calc(22*var(--pt));color:#fff}
+/* warranty band: one row for up to 3 items, then a 2- or 3-column grid in two rows */
+.wlist{display:flex;align-items:center;height:calc(57*var(--pt));gap:calc(22*var(--pt));color:#fff;font-size:calc(11.8*var(--pt));line-height:1.3;white-space:nowrap}
 .wlist span>span:first-child{color:var(--olive)}
+.wlist:has(>span:nth-child(4)){display:grid;grid-template-columns:repeat(2,auto);align-content:center;justify-content:start;gap:calc(4*var(--pt)) calc(30*var(--pt));font-size:calc(10.5*var(--pt))}
+.wlist:has(>span:nth-child(5)){grid-template-columns:repeat(3,auto);gap:calc(4*var(--pt)) calc(18*var(--pt));font-size:calc(9.5*var(--pt))}
 
 /* 6. contact */
 .ccard{background:var(--olive);color:#fff;border-radius:calc(12*var(--pt));padding:calc(39*var(--pt)) calc(12*var(--pt)) calc(18*var(--pt)) calc(19*var(--pt))}
@@ -240,6 +259,7 @@ details.grp[open]>summary::after{content:"–"}
   .mobile-bar button.pdf{background:var(--navy);border-color:var(--navy);color:#fff}
   .mobile-bar button:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
   .editor{border-right:none;border-bottom:1px solid var(--line)}
+  .resizer{display:none}
   .ed-scroll{overflow:visible}
   .preview{overflow:visible;padding:16px}
   .top-install-btn{top:10px;right:12px;padding:6px 12px;font-size:11.5px;z-index:1001}
@@ -255,7 +275,8 @@ details.grp[open]>summary::after{content:"–"}
   .page{box-shadow:none;margin:0 auto;break-after:page;page-break-after:always}
   .page:last-child{break-after:auto;page-break-after:auto}
   .page.overflow::after{display:none}
-  [data-edit]:hover,[data-edit]:focus{outline:none}
+  [data-edit]:hover,[data-edit]:focus,[data-bind]:hover,[data-bind]:focus{outline:none}
+  [data-bind]:empty::before{content:none}
 }
 </style>
 </head>
@@ -268,6 +289,7 @@ details.grp[open]>summary::after{content:"–"}
 
 <!-- =================== EDITOR =================== -->
 <aside class="editor" aria-label="Proposal details">
+  <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="Resize the details panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
   <div class="ed-head">
     <img src="assets/logo.png" alt="Future Energies">
     <h1>Proposal builder</h1>
@@ -288,7 +310,7 @@ details.grp[open]>summary::after{content:"–"}
   </div>
   <div class="ed-scroll">
     <div class="warnings" id="warnings"></div>
-    <p class="tip">Tip: text with a dashed outline on hover (about the company, general T&amp;C, AMC) can be edited directly on the page. <a href="#" id="btnResetText">Reset edited text</a></p>
+    <p class="tip">Tip: text with a dashed outline on hover (about the company, the whole project summary page, general T&amp;C, AMC) can be edited directly on the page. <a href="#" id="btnResetText">Reset edited text</a></p>
 
     <details class="grp" open><summary>Customer details</summary>
       <div class="grid2">
@@ -364,15 +386,24 @@ details.grp[open]>summary::after{content:"–"}
       </div>
     </details>
 
-    <details class="grp"><summary>KSEB charges, AMC &amp; warranty</summary>
+    <details class="grp"><summary>Warranty</summary>
+      <div class="bom-ed">
+        <p class="bom-note">Shown in the warranty band on page 5. The first row (<b>Panels</b>) also gives the warranty years on the cover and page 4. The <b>Battery</b> row is hidden for on-grid systems.</p>
+        <div class="wr-head"><span>Item</span><span>Years</span><span></span></div>
+        <div id="warrList"></div>
+        <div class="bom-actions">
+          <button class="btn primary" type="button" id="warrAdd">+ Add item</button>
+          <button class="btn" type="button" id="warrReset">Restore default list</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="grp"><summary>KSEB charges &amp; AMC</summary>
       <div class="grid2">
         <label class="fld"><span>KSEB feasibility fee</span><input data-k="ksebFeasibility"></label>
         <label class="fld"><span>Registration fee</span><input data-k="ksebRegistration"></label>
         <label class="fld"><span>Electrical inspectorate</span><input data-k="inspectorate"></label>
         <label class="fld"><span>Free maintenance (years)</span><input type="number" min="0" data-k="amcYears"></label>
-        <label class="fld"><span>Panel warranty (years)</span><input type="number" min="0" data-k="panelWarranty"></label>
-        <label class="fld"><span>Inverter warranty (years)</span><input type="number" min="0" data-k="invWarranty"></label>
-        <label class="fld" data-when="systemType!=On-grid"><span>Battery warranty (years)</span><input type="number" min="0" data-k="batteryWarranty"></label>
       </div>
     </details>
 
@@ -382,6 +413,8 @@ details.grp[open]>summary::after{content:"–"}
         <label class="fld"><span>Projects completed</span><input data-k="statProjects"></label>
         <div class="sub-h">Brands shown on page 2</div>
         <label class="fld chk"><input type="checkbox" data-k="brand_waaree">Waaree</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_havells">Havells</label>
+        <label class="fld chk"><input type="checkbox" data-k="brand_deye">Deye</label>
         <label class="fld chk"><input type="checkbox" data-k="brand_adani">Adani Solar</label>
         <label class="fld chk"><input type="checkbox" data-k="brand_renewsys">RenewSys</label>
         <label class="fld chk"><input type="checkbox" data-k="brand_vikram">Vikram Solar</label>
@@ -453,6 +486,8 @@ details.grp[open]>summary::after{content:"–"}
   <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, Future Energies partners with India’s most<br>trusted and reputed solar brands</p>
   <div class="a brands" style="--x:63;--y:619;--w:468">
     <div class="brand" data-show="brand_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
+    <div class="brand" data-show="brand_havells"><img src="assets/brands/havells.svg" alt="Havells" style="width:calc(82*var(--pt))"></div>
+    <div class="brand" data-show="brand_deye"><img src="assets/brands/deye.png" alt="Deye" style="width:calc(66*var(--pt))"></div>
     <div class="brand" data-show="brand_adani"><img src="assets/brands/adani.png" alt="Adani Solar" style="width:calc(49*var(--pt))"></div>
     <div class="brand" data-show="brand_renewsys"><img src="assets/brands/renewsys.png" alt="RenewSys" style="width:calc(64*var(--pt))"></div>
     <div class="brand" data-show="brand_vikram"><img src="assets/brands/vikram.png" alt="Vikram Solar" style="width:calc(76*var(--pt))"></div>
@@ -484,22 +519,23 @@ details.grp[open]>summary::after{content:"–"}
   </svg>
   <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:45">
   <div class="t kick" style="--x:125;--y:164;--fs:16">Project Summary</div>
-  <h2 class="t serif b6" style="--x:48;--y:214;--fs:22">Customized For</h2>
-  <div class="t" style="--x:124;--y:266;--fs:13.8" data-f="custName" data-maxx="540"></div>
-  <div class="tl" style="--x:125;--y:285;--fs:10.9;--lh:13;--w:405" data-f="custAddress" data-max="305"></div>
-  <div class="t" style="--x:124;--y:336;--fs:12.8" data-maxx="540">Contact no: <span data-f="custPhone"></span></div>
-  <div class="t" style="--x:124;--y:390;--fs:12.8" data-maxx="540">Mail ID : <span data-f="custEmail"></span></div>
-  <h2 class="t serif green b6" style="--x:49;--y:451;--fs:22">Project details</h2>
-  <div class="t" style="--x:124;--y:495;--fs:11">Prepared by</div>
-  <div class="t" style="--x:124;--y:513;--fs:13" data-f="preparedBy" data-maxx="540"></div>
-  <div class="t" style="--x:124;--y:556;--fs:11">Project name</div>
-  <div class="t" style="--x:124;--y:574;--fs:13" data-f="projectNameT" data-maxx="540"></div>
-  <div class="t" style="--x:124;--y:617;--fs:11">Project ID</div>
-  <div class="t" style="--x:124;--y:635;--fs:13" data-f="projectId" data-maxx="540"></div>
-  <div class="t" style="--x:124;--y:678;--fs:11">Date</div>
-  <div class="t" style="--x:124;--y:696;--fs:13" data-f="dateT"></div>
-  <div class="t" style="--x:124;--y:739;--fs:11">Project Manager</div>
-  <div class="t" style="--x:124;--y:757;--fs:13" data-f="projectManager" data-maxx="540"></div>
+  <!-- every label and value on this page can be edited on the page; values stay in sync with the form -->
+  <h2 class="t serif b6" style="--x:48;--y:214;--fs:22" data-edit="p3Head1" data-oneline contenteditable="true" spellcheck="false">Customized For</h2>
+  <div class="t" style="--x:124;--y:266;--fs:13.8" data-f="custName" data-bind="custName" data-ph="Client name" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="tl" style="--x:125;--y:285;--fs:10.9;--lh:13;--w:405" data-f="custAddress" data-bind="custAddress" data-ph="Address" contenteditable="true" spellcheck="false" data-max="305"></div>
+  <div class="t" style="--x:124;--y:336;--fs:12.8" data-maxx="540"><span data-edit="p3Contact" data-oneline contenteditable="true" spellcheck="false">Contact no:</span> <span data-f="custPhone" data-bind="custPhone" data-ph="Phone number" contenteditable="true" spellcheck="false"></span></div>
+  <div class="t" style="--x:124;--y:390;--fs:12.8" data-maxx="540"><span data-edit="p3Mail" data-oneline contenteditable="true" spellcheck="false">Mail ID :</span> <span data-f="custEmail" data-bind="custEmail" data-ph="Email" contenteditable="true" spellcheck="false"></span></div>
+  <h2 class="t serif green b6" style="--x:49;--y:451;--fs:22" data-edit="p3Head2" data-oneline contenteditable="true" spellcheck="false">Project details</h2>
+  <div class="t" style="--x:124;--y:495;--fs:11" data-edit="p3Label1" data-oneline contenteditable="true" spellcheck="false">Prepared by</div>
+  <div class="t" style="--x:124;--y:513;--fs:13" data-f="preparedBy" data-bind="preparedBy" data-ph="Prepared by" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:556;--fs:11" data-edit="p3Label2" data-oneline contenteditable="true" spellcheck="false">Project name</div>
+  <div class="t" style="--x:124;--y:574;--fs:13" data-f="projectNameT" data-bind="projectName" data-ph="Project name" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:617;--fs:11" data-edit="p3Label3" data-oneline contenteditable="true" spellcheck="false">Project ID</div>
+  <div class="t" style="--x:124;--y:635;--fs:13" data-f="projectId" data-bind="projectId" data-ph="Project ID" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:678;--fs:11" data-edit="p3Label4" data-oneline contenteditable="true" spellcheck="false">Date</div>
+  <div class="t" style="--x:124;--y:696;--fs:13" data-f="dateT" data-bind="dateText" data-ph="Date" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="t" style="--x:124;--y:739;--fs:11" data-edit="p3Label5" data-oneline contenteditable="true" spellcheck="false">Project Manager</div>
+  <div class="t" style="--x:124;--y:757;--fs:13" data-f="projectManager" data-bind="projectManager" data-ph="Project manager" contenteditable="true" spellcheck="false" data-maxx="540"></div>
   <div class="pnum">PROPOSAL / 03</div>
 </section>
 
@@ -511,12 +547,10 @@ details.grp[open]>summary::after{content:"–"}
     <image href="assets/art/p4-leaf.svg" x="360" y="0" width="120" height="256"/>
     <image href="assets/art/p4-panel.svg" x="470" y="298" width="125.3" height="230"/>
     <line x1="44" y1="106" x2="70" y2="106" stroke="#98C93E" stroke-width="1"/>
-    <image href="assets/art/feat-sun.svg" x="41" y="729" width="41" height="41"/>
-    <image href="assets/art/feat-battery.svg" x="174" y="729" width="41" height="41" data-show="hasBattery"/>
-    <image href="assets/art/feat-grid.svg" x="174" y="729" width="41" height="41" data-show="isOngrid"/>
-    <image href="assets/art/feat-monitor.svg" x="302" y="729" width="41" height="41"/>
-    <image href="assets/art/feat-shield.svg" x="426" y="729" width="41" height="41"/>
-    <path d="M163 732.2V765.8M291 733.7V767.3M414 733.7V767.3" stroke="#58595B" stroke-width=".25"/>
+    <image href="assets/art/feat-sun.svg" x="63" y="729" width="41" height="41"/>
+    <image href="assets/art/feat-monitor.svg" x="226" y="729" width="41" height="41"/>
+    <image href="assets/art/feat-shield.svg" x="389" y="729" width="41" height="41"/>
+    <path d="M204 732.2V765.8M367 732.2V765.8" stroke="#58595B" stroke-width=".25"/>
   </svg>
   <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:39">
   <div class="t kick" style="--x:77;--y:104.5;--fs:8">System Configuration</div>
@@ -537,10 +571,9 @@ details.grp[open]>summary::after{content:"–"}
     <div class="ototal"><span>TOTAL PROJECT COST</span><b data-f="totalT"></b></div>
     <div class="osub" data-show="hasSubsidy"><span>Less: <span data-f="subsidyLabel"></span> (credited to your bank account) <b data-f="subsidyT"></b></span><span>Net cost after subsidy <b data-f="netCostT"></b></span></div>
   </div>
-  <div class="tl" style="--x:89;--y:742;--fs:7.9;--lh:12;--w:70">High Efficiency<br>Panels</div>
-  <div class="tl" style="--x:220;--y:742;--fs:7.9;--lh:12;--w:70"><span data-f="feat2a"></span><br><span data-f="feat2b"></span></div>
-  <div class="tl" style="--x:350;--y:742;--fs:7.9;--lh:12;--w:70">Smart Energy<br>Monitoring</div>
-  <div class="tl" style="--x:475;--y:742;--fs:7.9;--lh:12;--w:70"><span data-f="panelWarranty"></span>-Year<br>Warranty</div>
+  <div class="tl" style="--x:111;--y:742;--fs:7.9;--lh:12;--w:80">High Efficiency<br>Panels</div>
+  <div class="tl" style="--x:274;--y:742;--fs:7.9;--lh:12;--w:80">Smart Energy<br>Monitoring</div>
+  <div class="tl" style="--x:437;--y:742;--fs:7.9;--lh:12;--w:80"><span data-f="panelWarranty"></span>-Year<br>Warranty</div>
   <div class="pnum">PROPOSAL / 04</div>
 </section>
 
@@ -605,11 +638,7 @@ details.grp[open]>summary::after{content:"–"}
   <div class="tl white" style="--x:54;--y:552;--fs:7.9;--lh:19;--w:196" data-max="650">Late Payment: If your payment is late, a <span data-f="lateFeePct"></span>% monthly fee will apply until it’s paid.<br><span style="display:block;margin-top:calc(5*var(--pt))">Payment Options: You can pay through <span data-f="payModes"></span>.</span></div>
 
   <div class="t white" style="--x:116;--y:712;--fs:15.8">Warranty</div>
-  <div class="t wlist" style="--x:216;--y:712;--fs:11.8" data-maxx="555">
-    <span><span>Panels :</span> <span data-f="panelWarranty"></span> Years</span>
-    <span><span>Inverter :</span> <span data-f="invWarranty"></span> Years</span>
-    <span data-show="hasBattery"><span>Battery :</span> <span data-f="batteryWarranty"></span> Years</span>
-  </div>
+  <div class="a wlist" style="--x:216;--y:684" data-maxx="555" data-render="warranty"></div>
   <div class="pnum">PROPOSAL / 05</div>
 </section>
 
@@ -677,21 +706,34 @@ const TYPES = ['Hybrid', 'On-grid', 'Off-grid'];
 // Cleared by "New proposal" and never offered as suggestions; everything else is remembered on this device.
 const CUSTOMER_KEYS = ['custName', 'custAddress', 'custPhone', 'custEmail'];
 
+// Warranty band on page 5. The panel row also feeds the cover and page 4; the battery row is hidden for on-grid.
+const DEFAULT_WARRANTY = [
+  { kind: 'panel', label: 'Panels', years: '30' },
+  { kind: 'inverter', label: 'Inverter', years: '12' },
+  { kind: 'battery', label: 'Battery', years: '10' }
+];
+const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
+  .filter(w => w && typeof w === 'object')
+  .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
+const BRAND_KEYS = ['brand_waaree', 'brand_havells', 'brand_deye', 'brand_adani', 'brand_renewsys', 'brand_vikram', 'brand_tata', 'brand_premier'];
+
 const DEFAULTS = {
+  v: 2,
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000', custEmail: '',
-  projectId: 'FE26_0001', date: todayISO(), preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
-  systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Solinteg',
-  panelMake: 'Adani TopCon', panelWatt: 620, panelCount: 16, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)',
+  projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
+  systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
+  panelMake: 'Waaree', panelWatt: 620, panelCount: 16, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)',
   batteryMake: 'Solinteg', batteryCount: 3, batterySpec: '102.4V, 50AH',
   systemCost: 600000, gstPct: 8.9, subsidyMode: 'none', subsidyCustom: 78000,
-  pay1Pct: 30, pay1a: 'upfront', pay1b: 'when you agree to start',
-  pay2Pct: 60, pay2a: 'after we deliver', pay2b: 'the solar equipment',
-  pay3Pct: 10, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
+  pay1Pct: 50, pay1a: 'upfront', pay1b: 'when you agree to start',
+  pay2Pct: 30, pay2a: 'after we deliver', pay2b: 'the solar equipment',
+  pay3Pct: 20, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
   lateFeePct: 1.5, payModes: 'NEFT, cheque or online',
   ksebFeasibility: '1,000', ksebRegistration: '11,800', inspectorate: 'NIL',
-  amcYears: 5, panelWarranty: 30, invWarranty: 12, batteryWarranty: 10,
+  amcYears: 5, warranty: DEFAULT_WARRANTY,
   statSavings: '70-100%', statProjects: '100+',
-  brand_waaree: true, brand_adani: true, brand_renewsys: true, brand_vikram: true, brand_tata: true, brand_premier: true,
+  brand_waaree: true, brand_havells: true, brand_deye: true,
+  brand_adani: false, brand_renewsys: false, brand_vikram: false, brand_tata: false, brand_premier: false,
   coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
   coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
   gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
@@ -742,8 +784,8 @@ const bomCell = (r, a, f) => String(r[f]).trim() || (a[f] ?? '');
 
 // Suggestions offered in the form (customer details are never collected here)
 const SUGGEST = {
-  panelMake: ['Adani TopCon', 'Waaree', 'Vikram Solar', 'Tata Power', 'Premier Energies', 'RenewSys'],
-  invMake: ['Solinteg', 'Deye', 'Growatt', 'Sungrow', 'Havells'],
+  panelMake: ['Waaree', 'Adani', 'Vikram Solar', 'Tata Power', 'Premier Energies', 'RenewSys'],
+  invMake: ['Waaree / Havells / Deye', 'Waaree', 'Havells', 'Deye', 'Solinteg'],
   batteryMake: ['Solinteg', 'Deye'],
   'bom.component': [...new Set(Object.values(DEFAULT_BOMS).flat().map(r => r.component).filter(Boolean))],
   'bom.brand': [...new Set(Object.values(DEFAULT_BOMS).flat().map(r => r.brand).filter(Boolean))],
@@ -751,7 +793,7 @@ const SUGGEST = {
   'bom.qty': ['1 No', '2 Nos', '3 Nos', 'Lot', 'Required', 'Nil']
 };
 
-let state = { ...DEFAULTS, boms: normBoms() };
+let state = { ...DEFAULTS, boms: normBoms(), warranty: normWarranty() };
 let edits = {};
 let hist = {};
 const original = {};
@@ -766,13 +808,39 @@ const fmtDate = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-d
 const fee = x => { const t = String(x ?? '').trim(); return !t ? 'NIL' : /^[\d,.\s]+$/.test(t) ? `${t}/-` : t; };
 const bom = () => state.boms[state.systemType] || (state.boms[state.systemType] = normBom(null, state.systemType));
 
+// Brings details saved by an older version of the app (or an older proposal file) up to date.
+// Values the user changed are kept; only values still at the old defaults move to the new ones.
+function migrate(saved) {
+  const s = { ...saved };
+  if ((Number(s.v) || 1) < 2) {
+    if (s.pay1Pct === 30 && s.pay2Pct === 60 && s.pay3Pct === 10) Object.assign(s, { pay1Pct: 50, pay2Pct: 30, pay3Pct: 20 });
+    if (s.panelMake === 'Adani TopCon') s.panelMake = DEFAULTS.panelMake;
+    if (s.invMake === 'Solinteg') s.invMake = DEFAULTS.invMake;
+    if (s.brand_havells === undefined) BRAND_KEYS.forEach(k => { s[k] = DEFAULTS[k]; });
+    if (!Array.isArray(s.warranty)) {
+      s.warranty = normWarranty();
+      [['panel', 'panelWarranty'], ['inverter', 'invWarranty'], ['battery', 'batteryWarranty']].forEach(([kind, key]) => {
+        if (s[key] !== undefined && s[key] !== '') s.warranty.find(w => w.kind === kind).years = String(s[key]);
+      });
+    }
+    ['panelWarranty', 'invWarranty', 'batteryWarranty'].forEach(k => { delete s[k]; });
+  }
+  s.v = DEFAULTS.v;
+  return s;
+}
+function fromSaved(saved) {
+  const s = { ...DEFAULTS, ...migrate(saved) };
+  if (!TYPES.includes(s.systemType)) s.systemType = DEFAULTS.systemType;
+  s.boms = normBoms(s.boms);
+  s.warranty = normWarranty(s.warranty);
+  return s;
+}
+
 function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE) || 'null');
-    if (saved) { state = { ...DEFAULTS, ...saved.state }; edits = saved.edits || {}; }
+    if (saved && saved.state) { state = fromSaved(saved.state); edits = saved.edits || {}; }
   } catch (e) { /* storage unavailable: run with defaults */ }
-  if (!TYPES.includes(state.systemType)) state.systemType = DEFAULTS.systemType;
-  state.boms = normBoms(state.boms);
   try { hist = JSON.parse(localStorage.getItem(HIST_STORE) || '{}') || {}; } catch (e) { hist = {}; }
 }
 function save() {
@@ -807,10 +875,11 @@ function derive(s) {
   v.dcKwp = n('panelCount') * n('panelWatt') / 1000;
   v.phaseT = s.phase === 'Single phase' ? '1 Phase' : '3 Phase';
   v.isOngrid = s.systemType === 'On-grid';
-  v.hasBattery = !v.isOngrid;
-  v.projectNameT = String(s.projectName).trim() || `${v.kwT}kW rooftop ${s.systemType.toLowerCase()} solar system`;
-  v.feat2a = v.isOngrid ? 'Net Metering' : s.systemType === 'Hybrid' ? 'Hybrid Battery' : 'Battery Power';
-  v.feat2b = v.isOngrid ? 'Savings' : 'Backup';
+  // Typed text is shown as typed (not trimmed) so editing on the page never moves the cursor
+  v.projectNameT = String(s.projectName).trim() ? s.projectName : `${v.kwT}kW rooftop ${s.systemType.toLowerCase()} solar system`;
+  v.warrantyRows = s.warranty.filter(w => !(w.kind === 'battery' && v.isOngrid) && (w.label.trim() || w.years.trim()));
+  const pw = s.warranty.find(w => w.kind === 'panel') || s.warranty[0];
+  v.panelWarranty = pw ? pw.years.trim() : '';
 
   // Commercial offer
   v.cost = Math.round(n('systemCost'));
@@ -839,7 +908,7 @@ function derive(s) {
 
   // Dates
   const d = s.date ? new Date(s.date + 'T00:00:00') : new Date();
-  v.dateT = fmtDate(d);
+  v.dateT = String(s.dateText).trim() ? s.dateText : fmtDate(d); // text typed on page 3 wins over the date picker
 
   // Company
   v.coPhones = [s.coPhone1, s.coPhone2].map(x => String(x).trim()).filter(Boolean).join('\n');
@@ -863,6 +932,8 @@ function render(v) {
     if (!c('component') && !c('brand') && !c('spec')) return '';
     return `<tr><td>${esc(c('component'))}</td><td>${esc(c('brand'))}</td><td>${esc(c('spec'))}</td><td>${esc(c('qty'))}</td></tr>`;
   }).join('');
+  const years = y => /^\d+(\.\d+)?$/.test(y.trim()) ? `${y.trim()} Years` : y.trim();
+  R.warranty = v.warrantyRows.map(w => `<span><span>${esc(w.label.trim())} :</span> ${esc(years(w.years))}</span>`).join('');
   return R;
 }
 
@@ -976,9 +1047,38 @@ function onField(e) {
   const k = el.dataset.k;
   state[k] = el.type === 'checkbox' ? el.checked : (el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value);
   if (k === 'systemType') renderBomEditor();
+  if (k === 'date') state.dateText = '';
   update(); save();
 }
+// Values typed straight onto page 3 go into the same details as the form
+function syncBound(el, final) {
+  const k = el.dataset.bind;
+  let val = el.textContent;
+  if (final) val = val.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+  state[k] = val;
+  const fld = $(`[data-k="${k}"]`);
+  if (fld) {
+    fld.value = val;
+    if (final && fld.dataset.hist) remember(fld.dataset.hist, val);
+  }
+  save(); update();
+}
+document.addEventListener('focusout', e => {
+  const bd = e.target.closest && e.target.closest('[data-bind]');
+  // only when typed in, so clicking into the automatic project name or date doesn't freeze it
+  if (bd && bd.dataset.typed) { delete bd.dataset.typed; syncBound(bd, true); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-bind],[data-oneline]')) { e.preventDefault(); e.target.blur(); }
+});
+document.addEventListener('paste', e => {
+  if (!(e.target.closest && e.target.closest('[data-bind],[data-oneline]'))) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, (e.clipboardData.getData('text/plain') || '').replace(/\s+/g, ' '));
+});
 document.addEventListener('input', e => {
+  const bd = e.target.closest && e.target.closest('[data-bind]');
+  if (bd) { bd.dataset.typed = '1'; syncBound(bd, false); return; }
   const ed = e.target.closest && e.target.closest('[data-edit]');
   if (ed) { edits[ed.dataset.edit] = ed.innerHTML; save(); update(); return; }
   const bf = e.target.dataset && e.target.dataset.bf;
@@ -1022,6 +1122,37 @@ $('#bomAdd').addEventListener('click', () => {
   const rows = $$('#bomList .bom-row');
   rows[rows.length - 1].querySelector('[data-bf="component"]').focus();
 });
+// ---------- Warranty list ----------
+function renderWarrantyEditor() {
+  $('#warrList').innerHTML = state.warranty.map((w, i) => `
+    <div class="wr-row" data-i="${i}">
+      <input data-wf="label" value="${esc(w.label)}" placeholder="Item" aria-label="Warranty item ${i + 1}">
+      <input data-wf="years" value="${esc(w.years)}" placeholder="Years" inputmode="decimal" aria-label="Years, warranty item ${i + 1}">
+      <button type="button" data-wact="del" title="Remove" aria-label="Remove warranty item ${i + 1}">✕</button>
+    </div>`).join('');
+}
+$('#warrList').addEventListener('input', e => {
+  const f = e.target.dataset.wf; if (!f) return;
+  const w = state.warranty[+e.target.closest('.wr-row').dataset.i];
+  if (w) { w[f] = e.target.value; update(); save(); }
+});
+$('#warrList').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-wact="del"]'); if (!btn) return;
+  state.warranty.splice(+btn.closest('.wr-row').dataset.i, 1);
+  renderWarrantyEditor(); update(); save();
+});
+$('#warrAdd').addEventListener('click', () => {
+  state.warranty.push({ kind: 'item', label: '', years: '' });
+  renderWarrantyEditor(); update(); save();
+  const rows = $$('#warrList .wr-row');
+  rows[rows.length - 1].querySelector('[data-wf="label"]').focus();
+});
+$('#warrReset').addEventListener('click', () => {
+  if (!confirm('Replace the warranty list with the default one (Panels, Inverter, Battery)?')) return;
+  state.warranty = normWarranty();
+  renderWarrantyEditor(); update(); save();
+});
+
 $('#bomReset').addEventListener('click', () => {
   if (!confirm(`Replace the ${state.systemType} bill of materials with the default list? Your changes to it will be lost.`)) return;
   state.boms[state.systemType] = normBom(null, state.systemType);
@@ -1034,7 +1165,54 @@ function fit() {
   const pagePx = 210 * 96 / 25.4;
   document.documentElement.style.setProperty('--z', Math.min(1, avail / pagePx).toFixed(3));
 }
-window.addEventListener('resize', () => { fit(); update(); });
+window.addEventListener('resize', () => { setSide(sideW); update(); });
+
+// ---------- Resizable details panel (desktop): drag the edge, arrow keys, double-click resets ----------
+const SIDE_STORE = 'fe-side-width';
+const SIDE_DEFAULT = 370;
+const resizer = $('#resizer');
+const sideBounds = () => ({ min: 300, max: Math.max(300, Math.min(900, window.innerWidth - 380)) });
+let sideW = SIDE_DEFAULT;
+let dragging = false;
+function setSide(px, persist) {
+  const { min, max } = sideBounds();
+  const w = Math.round(Math.min(max, Math.max(min, px)));
+  document.documentElement.style.setProperty('--side', w + 'px');
+  resizer.setAttribute('aria-valuemin', min);
+  resizer.setAttribute('aria-valuemax', max);
+  resizer.setAttribute('aria-valuenow', w);
+  fit();
+  if (persist) { try { localStorage.setItem(SIDE_STORE, String(w)); } catch (e) { /* ignore */ } }
+  return w;
+}
+resizer.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  dragging = true;
+  try { resizer.setPointerCapture(e.pointerId); } catch (err) { /* keep dragging without capture */ }
+  document.body.classList.add('resizing');
+});
+resizer.addEventListener('pointermove', e => { if (dragging) sideW = setSide(e.clientX); });
+const endDrag = () => {
+  if (!dragging) return;
+  dragging = false;
+  document.body.classList.remove('resizing');
+  sideW = setSide(sideW, true);
+  update();
+};
+resizer.addEventListener('pointerup', endDrag);
+resizer.addEventListener('pointercancel', endDrag);
+resizer.addEventListener('lostpointercapture', endDrag);
+resizer.addEventListener('dblclick', () => { sideW = setSide(SIDE_DEFAULT, true); update(); });
+resizer.addEventListener('keydown', e => {
+  const step = e.shiftKey ? 48 : 16;
+  const { min, max } = sideBounds();
+  const next = { ArrowLeft: sideW - step, ArrowRight: sideW + step, Home: min, End: max }[e.key];
+  if (next === undefined) return;
+  e.preventDefault();
+  sideW = setSide(next, true);
+  update();
+});
 
 function getPdfFileName() {
   const v = derive(state);
@@ -1058,6 +1236,7 @@ $('#btnNew').addEventListener('click', () => {
   if (m) state.projectId = m[1] + String(Number(m[2]) + 1).padStart(m[2].length, '0') + m[3];
   CUSTOMER_KEYS.forEach(k => { state[k] = ''; });
   state.date = todayISO();
+  state.dateText = '';
   fillForm(); update(); save();
   const first = $('[data-k="custName"]');
   first.closest('details').open = true;
@@ -1077,11 +1256,9 @@ $('#fileImport').addEventListener('change', async e => {
   try {
     const data = JSON.parse(await f.text());
     if (!data || data.app !== 'fe-proposal' || typeof data.state !== 'object') throw new Error('bad file');
-    state = { ...DEFAULTS, ...data.state };
-    if (!TYPES.includes(state.systemType)) state.systemType = DEFAULTS.systemType;
-    state.boms = normBoms(state.boms);
+    state = fromSaved(data.state);
     edits = data.edits && typeof data.edits === 'object' ? data.edits : {};
-    fillForm(); renderBomEditor(); applyEdits(); update(); save();
+    fillForm(); renderBomEditor(); renderWarrantyEditor(); applyEdits(); update(); save();
   } catch (err) { alert('That file is not a Future Energies proposal file.'); }
   e.target.value = '';
 });
@@ -1097,8 +1274,10 @@ load();
 wireDatalists();
 fillForm();
 renderBomEditor();
+renderWarrantyEditor();
 applyEdits();
-fit();
+try { sideW = Number(localStorage.getItem(SIDE_STORE)) || SIDE_DEFAULT; } catch (e) { /* ignore */ }
+sideW = setSide(sideW);
 update();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(update);
 window.addEventListener('load', update);

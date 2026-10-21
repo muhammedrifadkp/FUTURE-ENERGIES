@@ -1,10 +1,10 @@
 // Offline support for the Future Energies Proposal Builder.
 // After you change any file and redeploy, raise the version number so phones pick up the update.
-const CACHE = 'fe-proposals-v1';
+const CACHE = 'fe-proposals-v2';
 
 const ART = [
   'p1-deco', 'p1-tri', 'p1-stats', 'p2-deco', 'p3-top', 'p3-bottom', 'p4-leaf', 'p4-panel', 'p5-sprig', 'p6-right', 'p6-dot', 'p6-bottom',
-  'feat-sun', 'feat-battery', 'feat-grid', 'feat-monitor', 'feat-shield',
+  'feat-sun', 'feat-monitor', 'feat-shield',
   'ic-user', 'ic-phone', 'ic-mail', 'ic-clipboard', 'ic-panel', 'ic-idcard', 'ic-calendar', 'ic-person',
   'ic-truck', 'ic-doc', 'ic-bulb', 'ic-notes', 'ic-hourglass', 'ic-useradd', 'ic-chart',
   'ic-amc-shield', 'ic-amc-check', 'ic-amc-shield2', 'ic-amc-search', 'ic-amc-truck', 'ic-warranty',
@@ -16,7 +16,7 @@ const FILES = [
   'manifest.webmanifest',
   'assets/logo.png',
   'assets/photo.jpg',
-  ...['waaree', 'adani', 'renewsys', 'vikram', 'tata-power', 'premier'].map(b => `assets/brands/${b}.png`),
+  ...['waaree.png', 'havells.svg', 'deye.png', 'adani.png', 'renewsys.png', 'vikram.png', 'tata-power.png', 'premier.png'].map(b => `assets/brands/${b}`),
   ...ART.map(a => `assets/art/${a}.svg`),
   'icons/icon-192.png',
   'icons/icon-512.png',
