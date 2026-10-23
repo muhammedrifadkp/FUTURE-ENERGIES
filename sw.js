@@ -1,7 +1,7 @@
 // Offline support for the Future Energies Proposal Builder.
 // For every release raise VERSION here, APP_VERSION in index.html and version.json together;
 // installed apps then switch to the new version by themselves.
-const VERSION = '2026.10.22-1';
+const VERSION = '2026.10.24-1';
 const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
@@ -10,7 +10,7 @@ const ART = [
   'ic-user', 'ic-phone', 'ic-mail', 'ic-clipboard', 'ic-panel', 'ic-idcard', 'ic-calendar', 'ic-person',
   'ic-truck', 'ic-doc', 'ic-bulb', 'ic-notes', 'ic-hourglass', 'ic-useradd', 'ic-chart',
   'ic-amc-shield', 'ic-amc-check', 'ic-amc-shield2', 'ic-amc-search', 'ic-amc-truck', 'ic-warranty',
-  'ic-phone-big', 'ic-pin', 'ic-mail-white', 'ic-phone-white', 'ic-insta-white'
+  'ic-phone-big', 'ic-pin', 'ic-pin-green', 'ic-mail-white', 'ic-phone-white', 'ic-insta-white'
 ];
 const FILES = [
   './',

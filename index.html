@@ -192,6 +192,10 @@ details.grp[open]>summary::after{content:"–"}
 .wr-row button:hover{border-color:var(--danger);color:var(--danger)}
 .wr-head{display:grid;grid-template-columns:1fr 84px 28px;gap:6px;font-size:11px;color:var(--muted);margin-bottom:4px}
 .fld[hidden]{display:none}
+/* required fields */
+.invalid{border-color:var(--danger)!important;background:#FFF6F5!important;box-shadow:0 0 0 2px rgba(180,35,24,.12)}
+.req-msg{color:var(--danger);font-size:11px;font-weight:600}
+.rq{color:var(--danger);font-style:normal}
 
 /* ---------- Preview ---------- */
 .preview{overflow:auto;padding:28px 24px 60px;min-width:0}
@@ -225,13 +229,12 @@ details.grp[open]>summary::after{content:"–"}
 
 .logo{position:absolute;left:calc(39*var(--pt));top:calc(var(--y)*var(--pt));width:calc(184*var(--pt));height:auto}
 .kick{font-family:var(--kick);font-weight:600;letter-spacing:.27em;color:var(--lime-2);text-transform:uppercase}
-.pnum{position:absolute;right:calc(54*var(--pt));top:calc(802*var(--pt));font:400 calc(10*var(--pt))/1.2 var(--sans);letter-spacing:.14em;color:var(--grey);white-space:pre}
 
 /* 1. cover */
 .stat-lbl{letter-spacing:.07em}
 
 /* 2. about */
-.brands{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;height:calc(144*var(--pt));gap:calc(20*var(--pt)) calc(58.5*var(--pt))}
+.brands{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:calc(14*var(--pt)) calc(58.5*var(--pt))}
 .brand{width:calc(117*var(--pt));height:calc(62*var(--pt));border:calc(1*var(--pt)) solid var(--ink);border-radius:calc(12*var(--pt));display:flex;align-items:center;justify-content:center}
 .brand img{display:block;height:auto}
 
@@ -260,6 +263,10 @@ details.grp[open]>summary::after{content:"–"}
 .ilist img{display:block;height:auto}
 .tc-list li{grid-template-columns:calc(32*var(--pt)) 1fr;column-gap:calc(12*var(--pt));min-height:calc(48*var(--pt))}
 .tc-list li>div{padding-top:calc(3*var(--pt));max-width:calc(196*var(--pt))}
+/* the net metering note and the KSEB fees stand out */
+.tc-list li:nth-child(3){background:var(--lime-50);border-radius:calc(7*var(--pt));margin:0 calc(-5*var(--pt)) 0 calc(-6*var(--pt));padding:0 calc(5*var(--pt)) 0 calc(6*var(--pt))}
+.hl{font-weight:700;color:var(--navy-x)}
+.hl2{font-weight:600;color:var(--navy-x)}
 /* keep the first lines clear of the plant stem drawn on the right */
 .tc-list li:nth-child(1)>div{max-width:calc(172*var(--pt))}
 .tc-list li:nth-child(2)>div{max-width:calc(184*var(--pt))}
@@ -344,20 +351,20 @@ details.grp[open]>summary::after{content:"–"}
         <span>Install app</span>
       </button>
     </div>
-    <p class="mem-tip">Everything except the customer details is remembered on this device and filled in again next time. <b>New proposal</b> clears only the customer details and moves the project ID up by one.</p>
+    <p class="mem-tip">Everything except the customer details and the registration fee is remembered on this device and filled in again next time. <b>New proposal</b> clears only those and moves the project ID up by one.</p>
     <p class="print-tip"><b>Download PDF</b> makes an exact A4 file on any phone or computer. On a phone it opens the share menu, so you can send it straight to WhatsApp or save it to Files.</p>
     <p class="print-tip" id="printTip"><b>Print</b> is for paper. In the print window set <b>Margins: None</b> and untick <b>Headers and footers</b>.</p>
   </div>
   <div class="ed-scroll">
     <div class="warnings" id="warnings"></div>
+    <div class="warn" id="reqBanner" role="alert" hidden style="margin:10px 18px 0"></div>
     <p class="tip">Tip: text with a dashed outline on hover (about the company, the whole project summary page, general T&amp;C, AMC) can be edited directly on the page. <a href="#" id="btnResetText">Reset edited text</a></p>
 
     <details class="grp" open><summary>Customer details</summary>
       <div class="grid2">
         <label class="fld full"><span>Client name</span><input data-k="custName" autocomplete="off"></label>
         <label class="fld full"><span>Address</span><input data-k="custAddress" autocomplete="off"></label>
-        <label class="fld"><span>Contact no.</span><input data-k="custPhone" inputmode="tel" autocomplete="off"></label>
-        <label class="fld"><span>Mail ID (optional)</span><input data-k="custEmail" inputmode="email" autocomplete="off"></label>
+        <label class="fld full"><span>Contact no.</span><input data-k="custPhone" inputmode="tel" autocomplete="off"></label>
       </div>
     </details>
 
@@ -368,6 +375,7 @@ details.grp[open]>summary::after{content:"–"}
         <label class="fld full"><span>Prepared by</span><input data-k="preparedBy" data-hist="preparedBy"></label>
         <label class="fld"><span>Project manager</span><select id="pmSelect"></select></label>
         <label class="fld" id="pmOtherWrap" hidden><span>Project manager name</span><input data-k="projectManager" data-hist="projectManager" placeholder="Type the name"></label>
+        <label class="fld full"><span>Project manager phone</span><input data-k="managerPhone" inputmode="tel" autocomplete="off" placeholder="Remembered for each manager"></label>
         <label class="fld full"><span>Project name (leave empty to fill in from the system)</span><input data-k="projectName" data-hist="projectName"></label>
         <label class="fld"><span>Proposal valid (days)</span><input type="number" min="1" data-k="validDays"></label>
       </div>
@@ -453,8 +461,9 @@ details.grp[open]>summary::after{content:"–"}
     <details class="grp"><summary>KSEB charges &amp; AMC</summary>
       <div class="grid2">
         <label class="fld"><span>KSEB feasibility fee</span><input data-k="ksebFeasibility"></label>
-        <label class="fld"><span>Registration fee</span><input data-k="ksebRegistration"></label>
+        <label class="fld"><span>Registration fee</span><input data-k="ksebRegistration" placeholder="Enter for each proposal"></label>
         <label class="fld"><span>Electrical inspectorate</span><input data-k="inspectorate"></label>
+        <div class="hint" data-hint="reg"></div>
         <label class="fld"><span>Free maintenance (years)</span><input type="number" min="0" data-k="amcYears"></label>
       </div>
     </details>
@@ -463,15 +472,17 @@ details.grp[open]>summary::after{content:"–"}
       <div class="grid2">
         <label class="fld"><span>Average energy savings</span><input data-k="statSavings"></label>
         <label class="fld"><span>Projects completed</span><input data-k="statProjects"></label>
-        <div class="sub-h">Brands shown on page 2</div>
-        <label class="fld chk"><input type="checkbox" data-k="brand_waaree">Waaree</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_havells">Havells</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_deye">Deye</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_adani">Adani Solar</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_renewsys">RenewSys</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_vikram">Vikram Solar</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_tata">Tata Power</label>
-        <label class="fld chk"><input type="checkbox" data-k="brand_premier">Premier Energies</label>
+        <div class="sub-h">Panel brands on page 2</div>
+        <label class="fld chk"><input type="checkbox" data-k="pb_waaree">Waaree</label>
+        <label class="fld chk"><input type="checkbox" data-k="pb_adani">Adani Solar</label>
+        <label class="fld chk"><input type="checkbox" data-k="pb_renewsys">RenewSys</label>
+        <label class="fld chk"><input type="checkbox" data-k="pb_vikram">Vikram Solar</label>
+        <label class="fld chk"><input type="checkbox" data-k="pb_tata">Tata Power</label>
+        <label class="fld chk"><input type="checkbox" data-k="pb_premier">Premier Energies</label>
+        <div class="sub-h">Inverter brands on page 2</div>
+        <label class="fld chk"><input type="checkbox" data-k="ib_waaree">Waaree</label>
+        <label class="fld chk"><input type="checkbox" data-k="ib_havells">Havells</label>
+        <label class="fld chk"><input type="checkbox" data-k="ib_deye">Deye</label>
       </div>
     </details>
 
@@ -528,7 +539,6 @@ details.grp[open]>summary::after{content:"–"}
   <div class="tl stat-lbl" style="--x:305;--y:750;--fs:9;--lh:15;--w:90">Performance<br>Warranty</div>
   <div class="t serif" style="--x:472;--y:733;--fs:24"><span data-f="statProjNum"></span><span class="green" style="font-size:1.4em;line-height:0" data-f="statProjPlus"></span></div>
   <div class="tl stat-lbl" style="--x:473;--y:750;--fs:9;--lh:15;--w:80">Projects<br>Completed</div>
-  <div class="pnum" style="color:var(--ink)">PROPOSAL / 01</div>
 </section>
 
 <!-- ========== 2. ABOUT & BRANDS ========== -->
@@ -545,17 +555,21 @@ details.grp[open]>summary::after{content:"–"}
   <div class="tl serif" style="--x:40;--y:232.5;--fs:13;--lh:21;--w:307;font-style:italic" data-edit="about" contenteditable="true" spellcheck="false" data-max="480">Future Energies is a trusted solar energy company committed to delivering reliable, efficient, and sustainable solar solutions across Kerala. We provide end-to-end services, including consultation, system design, supply, installation, approvals, and after-sales support. With a focus on quality, innovation, and customer satisfaction, we ensure every project is completed to the highest standards, helping our customers achieve long-term energy savings and a greener future.</div>
   <h2 class="t serif" style="--x:40;--y:530.5;--fs:21">Trusted Brands We Work With</h2>
   <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, Future Energies partners with India’s most<br>trusted and reputed solar brands</p>
-  <div class="a brands" style="--x:63;--y:619;--w:468">
-    <div class="brand" data-show="brand_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
-    <div class="brand" data-show="brand_havells"><img src="assets/brands/havells.png" alt="Havells" style="width:calc(82*var(--pt))"></div>
-    <div class="brand" data-show="brand_deye"><img src="assets/brands/deye.png" alt="Deye" style="width:calc(66*var(--pt))"></div>
-    <div class="brand" data-show="brand_adani"><img src="assets/brands/adani.png" alt="Adani Solar" style="width:calc(49*var(--pt))"></div>
-    <div class="brand" data-show="brand_renewsys"><img src="assets/brands/renewsys.png" alt="RenewSys" style="width:calc(64*var(--pt))"></div>
-    <div class="brand" data-show="brand_vikram"><img src="assets/brands/vikram.png" alt="Vikram Solar" style="width:calc(76*var(--pt))"></div>
-    <div class="brand" data-show="brand_tata"><img src="assets/brands/tata-power.png" alt="Tata Power" style="width:calc(48*var(--pt))"></div>
-    <div class="brand" data-show="brand_premier"><img src="assets/brands/premier.png" alt="Premier Energies" style="width:calc(58*var(--pt))"></div>
+  <div class="t serif" style="--x:63;--y:626;--fs:12.5">Panels</div>
+  <div class="a brands" style="--x:63;--y:635;--w:468" data-max="700">
+    <div class="brand" data-show="pb_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
+    <div class="brand" data-show="pb_adani"><img src="assets/brands/adani.png" alt="Adani Solar" style="width:calc(49*var(--pt))"></div>
+    <div class="brand" data-show="pb_renewsys"><img src="assets/brands/renewsys.png" alt="RenewSys" style="width:calc(64*var(--pt))"></div>
+    <div class="brand" data-show="pb_vikram"><img src="assets/brands/vikram.png" alt="Vikram Solar" style="width:calc(76*var(--pt))"></div>
+    <div class="brand" data-show="pb_tata"><img src="assets/brands/tata-power.png" alt="Tata Power" style="width:calc(48*var(--pt))"></div>
+    <div class="brand" data-show="pb_premier"><img src="assets/brands/premier.png" alt="Premier Energies" style="width:calc(58*var(--pt))"></div>
   </div>
-  <div class="pnum">PROPOSAL / 02</div>
+  <div class="t serif" style="--x:63;--y:726;--fs:12.5">Inverters</div>
+  <div class="a brands" style="--x:63;--y:735;--w:468" data-max="800">
+    <div class="brand" data-show="ib_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
+    <div class="brand" data-show="ib_havells"><img src="assets/brands/havells.png" alt="Havells" style="width:calc(82*var(--pt))"></div>
+    <div class="brand" data-show="ib_deye"><img src="assets/brands/deye.png" alt="Deye" style="width:calc(66*var(--pt))"></div>
+  </div>
 </section>
 
 <!-- ========== 3. PROJECT SUMMARY ========== -->
@@ -568,8 +582,8 @@ details.grp[open]>summary::after{content:"–"}
     <line x1="41" y1="166.5" x2="108" y2="166.5" stroke="#98C93E" stroke-width="2"/>
     <g fill="none" stroke="#B7B2B3" stroke-width=".25"><rect x="48" y="241" width="500" height="176"/><path d="M69 307H522M70 363.3H522"/></g>
     <image href="assets/art/ic-user.svg" x="70" y="259" width="32" height="32"/>
-    <image href="assets/art/ic-phone.svg" x="70" y="320" width="32" height="32"/>
-    <image href="assets/art/ic-mail.svg" x="70" y="374" width="32" height="33"/>
+    <image href="assets/art/ic-pin-green.svg" x="70" y="320" width="32" height="32"/>
+    <image href="assets/art/ic-phone.svg" x="70" y="374" width="32" height="32"/>
     <g fill="none" stroke="#8E8B8C" stroke-width=".25"><rect x="48" y="478" width="500" height="55"/><rect x="48" y="539" width="500" height="55"/><rect x="48" y="600" width="500" height="55"/><rect x="48" y="661" width="500" height="55"/><rect x="48" y="722" width="500" height="55"/></g>
     <g fill="#F7F9F2" stroke="#BEDB8A" stroke-width="1"><rect x="49" y="478" width="56" height="55"/><rect x="49" y="539" width="56" height="55"/><rect x="49" y="600" width="56" height="55"/><rect x="49" y="661" width="56" height="55"/><rect x="49" y="722" width="56" height="55"/></g>
     <image href="assets/art/ic-clipboard.svg" x="62" y="488.5" width="30" height="34"/>
@@ -582,10 +596,9 @@ details.grp[open]>summary::after{content:"–"}
   <div class="t kick" style="--x:125;--y:164;--fs:16">Project Summary</div>
   <!-- every label and value on this page can be edited on the page; values stay in sync with the form -->
   <h2 class="t serif b6" style="--x:48;--y:214;--fs:22" data-edit="p3Head1" data-oneline contenteditable="true" spellcheck="false">Customized For</h2>
-  <div class="t" style="--x:124;--y:266;--fs:13.8" data-f="custName" data-bind="custName" data-ph="Client name" contenteditable="true" spellcheck="false" data-maxx="540"></div>
-  <div class="tl" style="--x:125;--y:285;--fs:10.9;--lh:13;--w:405" data-f="custAddress" data-bind="custAddress" data-ph="Address" contenteditable="true" spellcheck="false" data-max="305"></div>
-  <div class="t" style="--x:124;--y:336;--fs:12.8" data-maxx="540"><span data-edit="p3Contact" data-oneline contenteditable="true" spellcheck="false">Contact no:</span> <span data-f="custPhone" data-bind="custPhone" data-ph="Phone number" contenteditable="true" spellcheck="false"></span></div>
-  <div class="t" style="--x:124;--y:390;--fs:12.8" data-maxx="540"><span data-edit="p3Mail" data-oneline contenteditable="true" spellcheck="false">Mail ID :</span> <span data-f="custEmail" data-bind="custEmail" data-ph="Email" contenteditable="true" spellcheck="false"></span></div>
+  <div class="t" style="--x:124;--y:281;--fs:13.8" data-f="custName" data-bind="custName" data-ph="Client name" contenteditable="true" spellcheck="false" data-maxx="540"></div>
+  <div class="tl" style="--x:124;--y:336;--fs:11.2;--lh:14;--w:410" data-max="362"><span data-edit="p3Addr" data-oneline contenteditable="true" spellcheck="false">Address:</span> <span data-f="custAddress" data-bind="custAddress" data-ph="Address" contenteditable="true" spellcheck="false"></span></div>
+  <div class="t" style="--x:124;--y:390;--fs:12.8" data-maxx="540"><span data-edit="p3Contact" data-oneline contenteditable="true" spellcheck="false">Contact no:</span> <span data-f="custPhone" data-bind="custPhone" data-ph="Phone number" contenteditable="true" spellcheck="false"></span></div>
   <h2 class="t serif green b6" style="--x:49;--y:451;--fs:22" data-edit="p3Head2" data-oneline contenteditable="true" spellcheck="false">Project details</h2>
   <div class="t" style="--x:124;--y:495;--fs:11" data-edit="p3Label1" data-oneline contenteditable="true" spellcheck="false">Prepared by</div>
   <div class="t" style="--x:124;--y:513;--fs:13" data-f="preparedBy" data-bind="preparedBy" data-ph="Prepared by" contenteditable="true" spellcheck="false" data-maxx="540"></div>
@@ -596,8 +609,7 @@ details.grp[open]>summary::after{content:"–"}
   <div class="t" style="--x:124;--y:678;--fs:11" data-edit="p3Label4" data-oneline contenteditable="true" spellcheck="false">Date</div>
   <div class="t" style="--x:124;--y:696;--fs:13" data-f="dateT" data-bind="dateText" data-ph="Date" contenteditable="true" spellcheck="false" data-maxx="540"></div>
   <div class="t" style="--x:124;--y:739;--fs:11" data-edit="p3Label5" data-oneline contenteditable="true" spellcheck="false">Project Manager</div>
-  <div class="t" style="--x:124;--y:757;--fs:13" data-f="projectManager" data-bind="projectManager" data-ph="Project manager" contenteditable="true" spellcheck="false" data-maxx="540"></div>
-  <div class="pnum">PROPOSAL / 03</div>
+  <div class="t" style="--x:124;--y:757;--fs:13" data-maxx="540"><span data-f="projectManager" data-bind="projectManager" data-ph="Project manager" contenteditable="true" spellcheck="false"></span><span data-show="hasMgrPhone"> · <span data-f="managerPhone" data-bind="managerPhone" data-ph="Phone" contenteditable="true" spellcheck="false"></span></span></div>
 </section>
 
 <!-- ========== 4. SYSTEM CONFIGURATION ========== -->
@@ -635,7 +647,6 @@ details.grp[open]>summary::after{content:"–"}
   <div class="tl" style="--x:111;--y:742;--fs:7.9;--lh:12;--w:80">High Efficiency<br>Panels</div>
   <div class="tl" style="--x:274;--y:742;--fs:7.9;--lh:12;--w:80">Smart Energy<br>Monitoring</div>
   <div class="tl" style="--x:437;--y:742;--fs:7.9;--lh:12;--w:80"><span data-f="panelWarranty"></span>-Year<br>Warranty</div>
-  <div class="pnum">PROPOSAL / 04</div>
 </section>
 
 <!-- ========== 5. PAYMENT TERMS & GENERAL T&C ========== -->
@@ -650,7 +661,7 @@ details.grp[open]>summary::after{content:"–"}
       <rect x="51" y="471" width="185" height="61" rx="12" data-show="pay3On"/>
     </g>
     <g fill="#8CB23F"><circle cx="75" cy="357" r="15" data-show="pay1On"/><circle cx="75" cy="429.5" r="15" data-show="pay2On"/><circle cx="75" cy="501.5" r="15" data-show="pay3On"/></g>
-    <rect x="263" y="338" width="305" height="78" rx="9.6" fill="#FBF8F3"/>
+    <rect x="263" y="338" width="305" height="78" rx="9.6" fill="#F1F8E5" stroke="#98C93E" stroke-width="1.2"/>
     <path d="M370 351.4V402.8M470 350.4V401.8" stroke="#A97C50" stroke-width=".25"/>
     <image href="assets/art/ic-hourglass.svg" x="277" y="357" width="31" height="31"/>
     <image href="assets/art/ic-useradd.svg" x="380" y="356" width="31" height="31"/>
@@ -673,12 +684,12 @@ details.grp[open]>summary::after{content:"–"}
     <li><img contenteditable="false" src="assets/art/ic-notes.svg" alt="" style="width:calc(32*var(--pt))"><div>Other Charges: Note that fees for KSEB feasibility and registration aren’t included in the quoted price. Electrical Inspectorate charges are also not included in the quoted price.</div></li>
   </ul>
 
-  <div class="tl" style="--x:313;--y:368;--fs:6.9;--lh:12;--w:55">KSEB<br>Feasibility Fee</div>
-  <div class="t" style="--x:313;--y:399.5;--fs:7.9" data-f="ksebFeasT"></div>
-  <div class="tl" style="--x:419;--y:367;--fs:6.9;--lh:12;--w:48">Registration<br>Fee</div>
-  <div class="t" style="--x:418;--y:399.5;--fs:7.9" data-f="ksebRegT"></div>
-  <div class="tl" style="--x:518;--y:363;--fs:6.9;--lh:10;--w:48">Electrical<br>Inspectorate<br>Charges</div>
-  <div class="t" style="--x:518;--y:399.5;--fs:7.9" data-f="inspectT"></div>
+  <div class="tl hl2" style="--x:313;--y:368;--fs:7.2;--lh:12;--w:55">KSEB<br>Feasibility Fee</div>
+  <div class="t hl" style="--x:313;--y:399.5;--fs:10.5" data-f="ksebFeasT"></div>
+  <div class="tl hl2" style="--x:419;--y:367;--fs:7.2;--lh:12;--w:48">Registration<br>Fee</div>
+  <div class="t hl" style="--x:418;--y:399.5;--fs:10.5" data-f="ksebRegT"></div>
+  <div class="tl hl2" style="--x:518;--y:363;--fs:7.2;--lh:10;--w:48">Electrical<br>Inspectorate<br>Charges</div>
+  <div class="t hl" style="--x:518;--y:399.5;--fs:10.5" data-f="inspectT"></div>
 
   <div class="t serif olive b6" style="--x:279;--y:446;--fs:12.8">AMC</div>
   <div class="tl white" style="--x:277;--y:538;--fs:7.9;--lh:19;--w:68;text-align:center">Free <span data-f="amcYears"></span>-Year<br>Maintenance<br>for Your<br>Solar System</div>
@@ -700,7 +711,6 @@ details.grp[open]>summary::after{content:"–"}
 
   <div class="t white" style="--x:116;--y:712;--fs:15.8">Warranty</div>
   <div class="a wlist" style="--x:216;--y:684" data-maxx="555" data-render="warranty"></div>
-  <div class="pnum">PROPOSAL / 05</div>
 </section>
 
 <!-- ========== 6. LET'S CONNECT ========== -->
@@ -758,7 +768,6 @@ details.grp[open]>summary::after{content:"–"}
       <div class="sig-line">Name &amp; date</div>
     </div>
   </div>
-  <div class="pnum">PROPOSAL / 06</div>
 </section>
 
 </div>
@@ -780,7 +789,8 @@ const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${pad(
 
 const TYPES = ['Hybrid', 'On-grid']; // the system types Future Energies sells
 // Cleared by "New proposal" and never offered as suggestions; everything else is remembered on this device.
-const CUSTOMER_KEYS = ['custName', 'custAddress', 'custPhone', 'custEmail'];
+const CUSTOMER_KEYS = ['custName', 'custAddress', 'custPhone'];
+const PER_PROPOSAL_KEYS = [...CUSTOMER_KEYS, 'ksebRegistration']; // cleared by New proposal
 
 // Warranty band on page 5. The panel row also feeds the cover and page 4; the battery row is hidden for on-grid.
 const DEFAULT_WARRANTY = [
@@ -791,11 +801,10 @@ const DEFAULT_WARRANTY = [
 const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
   .filter(w => w && typeof w === 'object')
   .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
-const BRAND_KEYS = ['brand_waaree', 'brand_havells', 'brand_deye', 'brand_adani', 'brand_renewsys', 'brand_vikram', 'brand_tata', 'brand_premier'];
 
 const DEFAULTS = {
-  v: 3,
-  custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000', custEmail: '',
+  v: 4,
+  custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
   panelMake: 'Waaree', panelWatt: 620, panelCount: 16, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)',
@@ -805,13 +814,14 @@ const DEFAULTS = {
   pay2Pct: 30, pay2a: 'after we deliver', pay2b: 'the solar equipment',
   pay3Pct: 20, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
   lateFeePct: 1.5, payModes: 'NEFT, cheque or online',
-  ksebFeasibility: '1,000', ksebRegistration: '11,800', inspectorate: 'NIL',
+  ksebFeasibility: '1,000', ksebRegistration: '', inspectorate: 'NIL',
   amcYears: 5, warranty: DEFAULT_WARRANTY,
   statSavings: '70-100%', statProjects: '100+',
-  brand_waaree: true, brand_havells: true, brand_deye: true,
-  brand_adani: false, brand_renewsys: false, brand_vikram: false, brand_tata: false, brand_premier: false,
+  pb_waaree: true, pb_adani: true, pb_renewsys: false, pb_vikram: false, pb_tata: false, pb_premier: false,
+  ib_waaree: true, ib_havells: true, ib_deye: true,
   showSign: true,
   packageId: '',
+  managerPhone: '', mgrName: '', mgrPhones: {},
   coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
   coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
   gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
@@ -821,31 +831,41 @@ const DEFAULTS = {
 // Bill of materials, one list per system type. Rows of kind panel / inverter / battery / meter / netmeter
 // fill blank cells from the System section.
 const ROW = (component, brand, spec, qty) => ({ kind: 'item', component, brand, spec, qty });
-const AC_DB = ROW('Solar AC DB', 'Finder / Mersen / LK', '1 In 1 Out, IP65', '1 No');
-const SOLAR_DC_DB = ROW('Solar DC DB', 'Finder / Mersen / LK', '1 In 1 Out, IP65, SPD Protection', '1 No');
+const AC_DB = ROW('Solar AC DB', 'Havells', '1 In 1 Out, IP65', '1 No');
+const SOLAR_DC_DB = ROW('Solar DC DB', 'Havells', '1 In 1 Out, IP65, SPD Protection', '1 No');
 const BATTERY_BOX = ROW('Battery Box', 'HV Box', '50AH', '1 No');
 const BOM_TAIL = [
   ROW('DC Cable', 'Polycab', '4 sq.mm', 'Lot'),
-  ROW('AC Cable', 'Polycab', '6 sq.mm', 'Lot'),
-  ROW('Earthing', 'Excel Earthing', 'Copper Bonded Rod 100 Micron Coating', '3 Nos'),
-  ROW('LA Earthing', 'Excel Earthing', '50 sq.mm Al Down Conductor', 'Required'),
+  ROW('AC Cable', 'Finolex / Apar', '6 sq.mm', 'Lot'),
+  ROW('Earthing', 'MNRE Approved', 'Copper Bonded Rod 100 Micron Coating', '3 Nos'),
+  ROW('LA Earthing', 'MNRE Approved', '50 sq.mm Al Down Conductor', 'Required'),
   ROW('AC Earthing', 'Copper', '10 SWG', 'Required'),
-  ROW('Lightning Arrester', 'Excel Earthing', 'Single Spike 100 Micron Coating', '1 No'),
+  ROW('Lightning Arrester', 'MNRE Approved', 'Single Spike 100 Micron Coating', '1 No'),
   ROW('Mounting Structure', 'TATA GI', 'Custom Design', 'Required'),
   ROW('Walkway', 'GP Structure', 'Custom Design', 'Required')
 ];
 const DEFAULT_BOMS = {
-  'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ROW('Hybrid DC DB', 'Finder / Mersen / LK', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
-    { kind: 'battery' }, BATTERY_BOX, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL],
-  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, { kind: 'netmeter' }, ...BOM_TAIL]
+  'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ROW('Hybrid DC DB', 'Havells', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
+    { kind: 'battery' }, BATTERY_BOX, { kind: 'meter' }, ...BOM_TAIL],
+  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, ...BOM_TAIL]
 };
 const BOM_FIELDS = ['component', 'brand', 'spec', 'qty'];
+// Moves bill-of-materials rows saved with the earlier default brands to the current ones; changed brands stay as they are
+function upgradeRows(rows) {
+  return (rows || []).filter(r => r && r.kind !== 'netmeter').map(r => {
+    const o = { ...r };
+    if (/DC DB$|AC DB$/.test(o.component) && o.brand === 'Finder / Mersen / LK') o.brand = 'Havells';
+    if (o.brand === 'Excel Earthing') o.brand = 'MNRE Approved';
+    if (o.component === 'AC Cable' && o.brand === 'Polycab') o.brand = 'Finolex / Apar';
+    return o;
+  });
+}
 const nos = n => `${n} ${Number(n) === 1 ? 'No' : 'Nos'}`;
 const AUTO = {
   panel: v => ({ component: 'Solar Panel', brand: v.panelMake, spec: `${v.panelWatt}Wp ${v.panelTech}`, qty: nos(v.panelCount) }),
   inverter: v => ({ component: `${v.systemType} inverter`, brand: v.invMake, spec: `${v.kwT}kW ${v.phaseT}`, qty: '1 No' }),
   battery: v => ({ component: 'Lithium Battery', brand: v.batteryMake, spec: v.batterySpec, qty: nos(v.batteryCount) }),
-  meter: v => ({ component: 'Solar Energy Meter', brand: 'Genus', spec: v.phaseT, qty: '1 No' }),
+  meter: v => ({ component: 'Solar Energy Meter', brand: 'HPL', spec: v.phaseT, qty: '1 No' }),
   netmeter: v => ({ component: 'Net Meter', brand: 'Genus', spec: v.phaseT, qty: 'Nil' })
 };
 const AUTO_LABEL = { panel: 'Solar panels: from System', inverter: 'Inverter: from System', battery: 'Battery: from System', meter: 'Energy meter: phase from System', netmeter: 'Net meter: phase from System' };
@@ -894,6 +914,13 @@ function loadPackages() {
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(PKG_STORE) || 'null'); } catch (e) { /* storage unavailable */ }
   packages = sortPackages(Array.isArray(saved) ? saved.map(normPackage).filter(Boolean) : demoPackages());
+  let upgraded = null;
+  try { upgraded = localStorage.getItem(PKG_STORE + '-up'); } catch (e) { /* ignore */ }
+  if (Array.isArray(saved) && upgraded !== '4') {
+    packages.forEach(p => { p.bom = normBom(upgradeRows(p.bom), p.type); });
+    savePackages();
+    try { localStorage.setItem(PKG_STORE + '-up', '4'); } catch (e) { /* ignore */ }
+  }
 }
 function savePackages() {
   try { localStorage.setItem(PKG_STORE, JSON.stringify(packages)); } catch (e) { /* ignore */ }
@@ -930,6 +957,8 @@ function storeCurrentAs(size) {
   update(); save();
 }
 
+// Phone numbers filled in when the client sends them; any number typed in the app is remembered per manager
+const DEFAULT_MANAGER_PHONES = { Shamil: '', Jasir: '', Riyas: '' };
 // Project managers in the dropdown; "Other" lets any name be typed
 const MANAGERS = ['Shamil', 'Jasir', 'Riyas'];
 // Suggestions offered in the form (customer details are never collected here)
@@ -966,7 +995,6 @@ function migrate(saved) {
     if (s.pay1Pct === 30 && s.pay2Pct === 60 && s.pay3Pct === 10) Object.assign(s, { pay1Pct: 50, pay2Pct: 30, pay3Pct: 20 });
     if (s.panelMake === 'Adani TopCon') s.panelMake = DEFAULTS.panelMake;
     if (s.invMake === 'Solinteg') s.invMake = DEFAULTS.invMake;
-    if (s.brand_havells === undefined) BRAND_KEYS.forEach(k => { s[k] = DEFAULTS[k]; });
     if (!Array.isArray(s.warranty)) {
       s.warranty = normWarranty();
       [['panel', 'panelWarranty'], ['inverter', 'invWarranty'], ['battery', 'batteryWarranty']].forEach(([kind, key]) => {
@@ -981,6 +1009,15 @@ function migrate(saved) {
     delete s.gstPct;
     if (s.subsidyMode === 'none') s.subsidyMode = 'auto'; // the old default; subsidy is now worked out as in Zairo
   }
+  if ((Number(s.v) || 1) < 4) {
+    s.pb_waaree = true; s.pb_adani = true; // panels: Waaree and Adani
+    ['renewsys', 'vikram', 'tata', 'premier'].forEach(b => { s['pb_' + b] = !!s['brand_' + b]; });
+    s.ib_waaree = true; s.ib_havells = s.brand_havells !== false; s.ib_deye = s.brand_deye !== false;
+    Object.keys(s).filter(k => k.startsWith('brand_')).forEach(k => { delete s[k]; });
+    if (s.boms && typeof s.boms === 'object') s.boms = Object.fromEntries(Object.entries(s.boms).map(([t, rows]) => [t, upgradeRows(rows)]));
+    if (s.ksebRegistration === '11,800') s.ksebRegistration = ''; // that was the sample's figure; now entered for each proposal
+    delete s.custEmail;
+  }
   s.v = DEFAULTS.v;
   return s;
 }
@@ -989,6 +1026,7 @@ function fromSaved(saved) {
   if (!TYPES.includes(s.systemType)) s.systemType = DEFAULTS.systemType;
   s.boms = normBoms(s.boms);
   s.warranty = normWarranty(s.warranty);
+  if (!s.mgrName) s.mgrName = String(s.projectManager || '').trim();
   return s;
 }
 
@@ -1059,7 +1097,7 @@ function derive(s) {
   v.paySum = n('pay1Pct') + n('pay2Pct') + n('pay3Pct');
 
   // Charges, cover
-  v.ksebFeasT = fee(s.ksebFeasibility); v.ksebRegT = fee(s.ksebRegistration); v.inspectT = fee(s.inspectorate);
+  v.ksebFeasT = fee(s.ksebFeasibility); v.ksebRegT = String(s.ksebRegistration).trim() ? fee(s.ksebRegistration) : '—'; v.inspectT = fee(s.inspectorate);
   const proj = String(s.statProjects).trim();
   v.statProjNum = proj.replace(/\+$/, ''); v.statProjPlus = proj.endsWith('+') ? '+' : '';
 
@@ -1077,6 +1115,7 @@ function derive(s) {
   v.hasCoInsta = !!insta;
   v.hasAccName = !!String(s.bankAccName).trim();
   v.hasUpi = !!String(s.bankUpi).trim();
+  v.hasMgrPhone = !!String(s.managerPhone).trim();
   v.noSign = !s.showSign;
   return v;
 }
@@ -1122,6 +1161,7 @@ function update() {
   const amt = i => inr(v.total * (Number(state[`pay${i}Pct`]) || 0) / 100);
   $('[data-hint="pay"]').innerHTML = `Step 1 ${amt(1)} · Step 2 ${amt(2)} · Step 3 ${amt(3)}<br>Total ${v.paySum}%`;
 
+  $('[data-hint="reg"]').innerHTML = Number(state.invKw) > 0 ? `Usual registration fee: ₹1,000 per kW + tax, so <b>${esc(kw(state.invKw))} kW → ${inr(state.invKw * 1000)} + tax</b>. Type the amount; it is not filled in automatically.` : 'Type the registration fee for this proposal.';
   const w = [];
   if (v.dcKwp && (ratio < 0.8 || ratio > 1.5)) w.push(`DC/AC ratio is ${ratio.toFixed(2)}. Check the panel count against the inverter size.`);
   if (v.paySum !== 100) w.push(`The payment steps add up to ${v.paySum}%, not 100%.`);
@@ -1217,7 +1257,21 @@ function onField(e) {
     renderBomEditor();
   }
   if (k === 'date') state.dateText = '';
+  if (k === 'projectManager' && e.type === 'change') commitManager();
+  if (k === 'managerPhone') rememberManagerPhone();
   update(); save();
+}
+// A manager's phone number is remembered, so choosing that manager again brings it back
+function rememberManagerPhone() {
+  const name = String(state.projectManager).trim();
+  if (name) state.mgrPhones[name] = String(state.managerPhone).trim();
+}
+function commitManager() {
+  const name = String(state.projectManager).trim();
+  if (name === state.mgrName) return;
+  state.mgrName = name;
+  state.managerPhone = name ? (state.mgrPhones[name] || DEFAULT_MANAGER_PHONES[name] || '') : '';
+  const f = $('[data-k="managerPhone"]'); if (f) f.value = state.managerPhone;
 }
 // Values typed straight onto page 3 go into the same details as the form
 function syncBound(el, final) {
@@ -1225,6 +1279,8 @@ function syncBound(el, final) {
   let val = el.textContent;
   if (final) val = val.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
   state[k] = val;
+  if (final && k === 'projectManager') commitManager();
+  if (k === 'managerPhone') rememberManagerPhone();
   const fld = $(`[data-k="${k}"]`);
   if (fld) {
     fld.value = val;
@@ -1307,6 +1363,8 @@ pmSelect.addEventListener('change', () => {
   const current = String(state.projectManager).trim();
   pmInput.value = pmOther ? (MANAGERS.includes(current) ? '' : current) : pmSelect.value;
   pmInput.dispatchEvent(new Event('input', { bubbles: true }));
+  commitManager();
+  save(); update();
   if (pmOther) pmInput.focus();
 });
 
@@ -1478,8 +1536,8 @@ function downloadBlob(blob, name) {
 // ---------- PDF made in the browser ----------
 // Each page is drawn to an image (html2canvas) and placed on an exact A4 page, so the file is the same
 // on iPhone, Android and computers: no browser margins, URL or date at the edges.
-const PDF_SCALE = 2.5; // about 240 dpi
-const PDF_QUALITY = 0.92;
+const PDF_QUALITY = 0.95;
+// resolution (x 96 dpi): 3.5 is about 336 dpi; phones use less, and a device that runs out of memory retries with less
 let h2cLoading = null;
 function loadHtml2canvas() {
   if (window.html2canvas) return Promise.resolve();
@@ -1554,12 +1612,12 @@ function artImage(svg, embedded, W, H) {
   });
 }
 
-async function buildPdf(onProgress) {
+async function buildPdf(onProgress, scale) {
   await loadHtml2canvas();
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
   const hrefs = [...new Set($$('.page svg.art image').map(im => im.getAttribute('href')))];
   const embedded = Object.fromEntries(await Promise.all(hrefs.map(async h => [h, await toDataUrl(h)])));
-  const W = Math.round(210 * 96 / 25.4 * PDF_SCALE), H = Math.round(297 * 96 / 25.4 * PDF_SCALE);
+  const W = Math.round(210 * 96 / 25.4 * scale), H = Math.round(297 * 96 / 25.4 * scale);
   const pages = $$('.page');
   const images = [];
   for (let i = 0; i < pages.length; i++) {
@@ -1573,7 +1631,7 @@ async function buildPdf(onProgress) {
     for (const svg of pages[i].querySelectorAll('svg.art')) ctx.drawImage(await artImage(svg, embedded, W, H), 0, 0, W, H);
     // 2. text, boxes and pictures on top, drawn by html2canvas without the artwork
     const top = await window.html2canvas(pages[i], {
-      scale: PDF_SCALE, backgroundColor: null, logging: false, windowWidth: 1400, windowHeight: 1000,
+      scale, backgroundColor: null, logging: false, windowWidth: 1400, windowHeight: 1000,
       onclone: doc => {
         doc.documentElement.classList.add('pdf-export');
         doc.querySelectorAll('.page svg.art').forEach(s => s.remove());
@@ -1607,16 +1665,23 @@ function pdfDialog(html, busy) {
 let pdfBusy = false;
 $('#btnPdf').addEventListener('click', async () => {
   if (pdfBusy) return;
+  if (!validate(true)) return;
   pdfBusy = true;
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   update();
   const modal = pdfDialog('<h3 id="pdfTitle">Creating PDF…</h3><p id="pdfStep">Preparing the pages</p><div class="pdf-bar"><i id="pdfFill"></i></div>', true);
   document.documentElement.classList.add('pdf-capturing');
   try {
-    const blob = await buildPdf((done, total) => {
+    const progress = (done, total) => {
       $('#pdfStep').textContent = done < total ? `Page ${done + 1} of ${total}` : 'Finishing the file';
       $('#pdfFill').style.width = `${Math.round(done / total * 100)}%`;
-    });
+    };
+    const scales = window.matchMedia('(pointer: coarse)').matches ? [3, 2.2] : [3.5, 2.5];
+    let blob;
+    for (let i = 0; i < scales.length; i++) {
+      try { blob = await buildPdf(progress, scales[i]); break; }
+      catch (err) { if (!err || err.message === 'no-jpeg' || i === scales.length - 1) throw err; } // out of memory: try a smaller size
+    }
     document.documentElement.classList.remove('pdf-capturing');
     const name = `${getPdfFileName()}.pdf`;
     const file = typeof File === 'function' ? new File([blob], name, { type: 'application/pdf' }) : null;
@@ -1652,8 +1717,49 @@ const safariPrint = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacInt
   (/Safari\//.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/.test(ua));
 if (safariPrint) { $('#btnPrint').hidden = true; $('#printTip').hidden = true; }
 
+// ---------- Required fields: shown in red when PDF / print / save is tried without them ----------
+const REQUIRED = [['custName'], ['custAddress'], ['custPhone'], ['projectId'], ['date'], ['projectManager'], ['managerPhone'],
+  ['invKw', true], ['panelCount', true], ['panelWatt', true], ['systemCost', true], ['ksebRegistration']];
+const reqEmpty = (k, num) => num ? !(Number(state[k]) > 0)
+  : k === 'date' ? !String(state.date || '').trim() && !String(state.dateText || '').trim() : !String(state[k] ?? '').trim();
+const reqField = k => k === 'projectManager' ? (pmOther ? pmInput : pmSelect) : $(`[data-k="${k}"]`);
+let reqShown = false;
+function markInvalid(el, msg) {
+  el.classList.add('invalid');
+  const box = el.closest('.fld');
+  if (box && msg && !box.querySelector('.req-msg')) { const m = document.createElement('small'); m.className = 'req-msg'; m.textContent = msg; box.appendChild(m); }
+}
+function validate(focusFirst) {
+  $$('.invalid').forEach(el => el.classList.remove('invalid'));
+  $$('.req-msg').forEach(m => m.remove());
+  const bad = [];
+  REQUIRED.forEach(([k, num]) => { if (reqEmpty(k, num)) bad.push([reqField(k), 'Required']); });
+  const sum = (Number(state.pay1Pct) || 0) + (Number(state.pay2Pct) || 0) + (Number(state.pay3Pct) || 0);
+  if (Math.abs(sum - 100) > 0.001) ['pay1Pct', 'pay2Pct', 'pay3Pct'].forEach((k, i) => bad.push([$(`[data-k="${k}"]`), i ? '' : 'Steps must total 100%']));
+  bad.forEach(([el, msg]) => markInvalid(el, msg));
+  reqShown = bad.length > 0 && (reqShown || focusFirst);
+  const banner = $('#reqBanner');
+  banner.hidden = !reqShown;
+  banner.textContent = `Please fill in the ${bad.length === 1 ? 'field' : bad.length + ' fields'} marked in red.`;
+  if (bad.length && focusFirst) {
+    const first = bad[0][0];
+    const grp = first.closest('details'); if (grp) grp.open = true;
+    first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+  }
+  return bad.length === 0;
+}
+// a red field turns normal as soon as it is fixed
+document.addEventListener('input', () => { if (reqShown) validate(false); });
+document.addEventListener('change', () => { if (reqShown) validate(false); });
+REQUIRED.forEach(([k]) => {
+  const label = (reqField(k) || pmSelect).closest('.fld'), span = label && label.querySelector('span');
+  if (span) span.insertAdjacentHTML('beforeend', ' <i class="rq" title="Required">*</i>');
+});
+
 // Actions
 $('#btnPrint').addEventListener('click', () => {
+  if (!validate(true)) return;
   const t = document.title;
   document.title = getPdfFileName();
   window.print();
@@ -1664,7 +1770,7 @@ $('#btnNew').addEventListener('click', () => {
   if (!confirm('Start a new proposal? The customer details are cleared and the project ID goes up by one. Everything else is kept.')) return;
   const m = String(state.projectId).match(/^(.*?)(\d+)(\D*)$/);
   if (m) state.projectId = m[1] + String(Number(m[2]) + 1).padStart(m[2].length, '0') + m[3];
-  CUSTOMER_KEYS.forEach(k => { state[k] = ''; });
+  PER_PROPOSAL_KEYS.forEach(k => { state[k] = ''; });
   state.date = todayISO();
   state.dateText = '';
   fillForm(); update(); save();
@@ -1673,6 +1779,7 @@ $('#btnNew').addEventListener('click', () => {
   first.focus();
 });
 $('#btnExport').addEventListener('click', () => {
+  if (!validate(true)) return;
   const blob = new Blob([JSON.stringify({ app: 'fe-proposal', version: 1, state, edits }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1816,7 +1923,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.22-1';
+const APP_VERSION = '2026.10.24-1';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;
