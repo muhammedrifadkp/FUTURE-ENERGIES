@@ -803,7 +803,7 @@ const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
   .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
 
 const DEFAULTS = {
-  v: 4,
+  v: 5,
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
@@ -835,7 +835,7 @@ const AC_DB = ROW('Solar AC DB', 'Havells', '1 In 1 Out, IP65', '1 No');
 const SOLAR_DC_DB = ROW('Solar DC DB', 'Havells', '1 In 1 Out, IP65, SPD Protection', '1 No');
 const BATTERY_BOX = ROW('Battery Box', 'HV Box', '50AH', '1 No');
 const BOM_TAIL = [
-  ROW('DC Cable', 'Polycab', '4 sq.mm', 'Lot'),
+  ROW('DC Cable', 'Waacab', '4 sq.mm', 'Lot'),
   ROW('AC Cable', 'Finolex / Apar', '6 sq.mm', 'Lot'),
   ROW('Earthing', 'MNRE Approved', 'Copper Bonded Rod 100 Micron Coating', '3 Nos'),
   ROW('LA Earthing', 'MNRE Approved', '50 sq.mm Al Down Conductor', 'Required'),
@@ -857,6 +857,7 @@ function upgradeRows(rows) {
     if (/DC DB$|AC DB$/.test(o.component) && o.brand === 'Finder / Mersen / LK') o.brand = 'Havells';
     if (o.brand === 'Excel Earthing') o.brand = 'MNRE Approved';
     if (o.component === 'AC Cable' && o.brand === 'Polycab') o.brand = 'Finolex / Apar';
+    if (o.component === 'DC Cable' && o.brand === 'Polycab') o.brand = 'Waacab';
     return o;
   });
 }
@@ -916,10 +917,10 @@ function loadPackages() {
   packages = sortPackages(Array.isArray(saved) ? saved.map(normPackage).filter(Boolean) : demoPackages());
   let upgraded = null;
   try { upgraded = localStorage.getItem(PKG_STORE + '-up'); } catch (e) { /* ignore */ }
-  if (Array.isArray(saved) && upgraded !== '4') {
+  if (Array.isArray(saved) && upgraded !== '5') {
     packages.forEach(p => { p.bom = normBom(upgradeRows(p.bom), p.type); });
     savePackages();
-    try { localStorage.setItem(PKG_STORE + '-up', '4'); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(PKG_STORE + '-up', '5'); } catch (e) { /* ignore */ }
   }
 }
 function savePackages() {
@@ -957,8 +958,8 @@ function storeCurrentAs(size) {
   update(); save();
 }
 
-// Phone numbers filled in when the client sends them; any number typed in the app is remembered per manager
-const DEFAULT_MANAGER_PHONES = { Shamil: '', Jasir: '', Riyas: '' };
+// Each manager's phone number; a number typed in the app is remembered per manager and wins
+const DEFAULT_MANAGER_PHONES = { Shamil: '+91 62359 99006', Jasir: '+91 62359 99005', Riyas: '+91 62359 99070' };
 // Project managers in the dropdown; "Other" lets any name be typed
 const MANAGERS = ['Shamil', 'Jasir', 'Riyas'];
 // Suggestions offered in the form (customer details are never collected here)
@@ -1017,6 +1018,14 @@ function migrate(saved) {
     if (s.boms && typeof s.boms === 'object') s.boms = Object.fromEntries(Object.entries(s.boms).map(([t, rows]) => [t, upgradeRows(rows)]));
     if (s.ksebRegistration === '11,800') s.ksebRegistration = ''; // that was the sample's figure; now entered for each proposal
     delete s.custEmail;
+  }
+  if ((Number(s.v) || 1) < 5) {
+    if (s.boms && typeof s.boms === 'object') s.boms = Object.fromEntries(Object.entries(s.boms).map(([t, rows]) => [t, upgradeRows(rows)]));
+    // managers' numbers: fill the ones still empty
+    s.mgrPhones = { ...(s.mgrPhones || {}) };
+    Object.entries(DEFAULT_MANAGER_PHONES).forEach(([name, phone]) => { if (!String(s.mgrPhones[name] || '').trim()) s.mgrPhones[name] = phone; });
+    const cur = String(s.projectManager || '').trim();
+    if (cur && !String(s.managerPhone || '').trim()) s.managerPhone = s.mgrPhones[cur] || '';
   }
   s.v = DEFAULTS.v;
   return s;
@@ -1923,7 +1932,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.24-1';
+const APP_VERSION = '2026.10.25-1';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;
