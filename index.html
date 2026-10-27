@@ -802,7 +802,7 @@ const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
   .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
 
 const DEFAULTS = {
-  v: 6,
+  v: 7,
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
@@ -839,16 +839,30 @@ const BOM_TAIL = [
   ROW('Earthing', 'MNRE Approved', 'Copper Bonded Rod 100 Micron Coating', '3 Nos'),
   ROW('LA Earthing', 'MNRE Approved', '50 sq.mm Al Down Conductor', 'Required'),
   ROW('AC Earthing', 'Copper', '10 SWG', 'Required'),
-  ROW('Lightning Arrester', 'MNRE Approved', 'Single Spike 100 Micron Coating', '1 No'),
+  ROW('Lightning Arrester', 'MNRE Approved', 'Single Spike 100 Micron Coating', '1 No')
+];
+// the structure comes straight after the panel and the inverter
+const BOM_STRUCTURE = [
   ROW('Mounting Structure', 'TATA GI', 'Custom Design', 'Required'),
   ROW('Walkway', 'GP Structure', 'Custom Design', 'Required')
 ];
 const DEFAULT_BOMS = {
-  'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ROW('Hybrid DC DB', 'Havells', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
+  'Hybrid': [{ kind: 'panel' }, { kind: 'inverter' }, ...BOM_STRUCTURE, ROW('Hybrid DC DB', 'Havells', '2 In 2 Out, IP65, SPD Protection', '1 No'), AC_DB,
     { kind: 'battery' }, BATTERY_BOX, { kind: 'meter' }, ...BOM_TAIL],
-  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, ...BOM_TAIL]
+  'On-grid': [{ kind: 'panel' }, { kind: 'inverter' }, ...BOM_STRUCTURE, SOLAR_DC_DB, AC_DB, { kind: 'meter' }, ...BOM_TAIL]
 };
 const BOM_FIELDS = ['component', 'brand', 'spec', 'qty'];
+function moveStructureUp(rows) {
+  const isStructure = r => r && r.kind === 'item' && (r.component === 'Mounting Structure' || r.component === 'Walkway');
+  const first = rows.findIndex(isStructure);
+  if (first < 0 || first < rows.length - 2) return rows; // not at the bottom: leave the order as it is
+  const tail = rows.slice(first);
+  if (!tail.every(isStructure)) return rows;
+  const rest = rows.slice(0, first);
+  const at = rest.findIndex(r => r.kind === 'inverter');
+  const pos = at >= 0 ? at + 1 : Math.min(2, rest.length);
+  return [...rest.slice(0, pos), ...tail, ...rest.slice(pos)];
+}
 // Moves bill-of-materials rows saved with the earlier default brands to the current ones; changed brands stay as they are
 function upgradeRows(rows) {
   return (rows || []).filter(r => r && r.kind !== 'netmeter').map(r => {
@@ -925,15 +939,15 @@ function loadPackages() {
   packages = sortPackages(Array.isArray(saved) ? saved.map(normPackage).filter(Boolean) : demoPackages());
   let upgraded = null;
   try { upgraded = localStorage.getItem(PKG_STORE + '-up'); } catch (e) { /* ignore */ }
-  if (Array.isArray(saved) && upgraded !== '6') {
-    packages.forEach(p => { p.bom = normBom(upgradeRows(p.bom), p.type); });
+  if (Array.isArray(saved) && upgraded !== '7') {
+    packages.forEach(p => { p.bom = normBom(moveStructureUp(upgradeRows(p.bom)), p.type); });
     CLIENT_PACKAGES.forEach(c => {
       const i = packages.findIndex(p => p.type === c.type && p.kw === c.kw);
       const v = i >= 0 ? packages[i].values : null;
       if (v && Number(v.systemCost) === 195000 && Number(v.panelCount) === 5) packages[i] = normPackage(clone(c)); // still the old demo figures
     });
     savePackages();
-    try { localStorage.setItem(PKG_STORE + '-up', '6'); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(PKG_STORE + '-up', '7'); } catch (e) { /* ignore */ }
   }
 }
 function savePackages() {
@@ -1039,6 +1053,9 @@ function migrate(saved) {
     Object.entries(DEFAULT_MANAGER_PHONES).forEach(([name, phone]) => { if (!String(s.mgrPhones[name] || '').trim()) s.mgrPhones[name] = phone; });
     const cur = String(s.projectManager || '').trim();
     if (cur && !String(s.managerPhone || '').trim()) s.managerPhone = s.mgrPhones[cur] || '';
+  }
+  if ((Number(s.v) || 1) < 7) {
+    if (s.boms && typeof s.boms === 'object') s.boms = Object.fromEntries(Object.entries(s.boms).map(([t, rows]) => [t, moveStructureUp(rows || [])]));
   }
   if ((Number(s.v) || 1) < 6) {
     if (String(s.statProjects).trim() === '100+') s.statProjects = '200+';
@@ -1950,7 +1967,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.27-2';
+const APP_VERSION = '2026.10.27-3';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;
