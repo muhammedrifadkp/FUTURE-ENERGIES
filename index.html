@@ -440,7 +440,6 @@ details.grp[open]>summary::after{content:"–"}
         <div class="pay-row"><label class="fld"><span>Step 1 %</span><input type="number" min="0" max="100" data-k="pay1Pct"></label><label class="fld"><span>first line</span><input data-k="pay1a"></label><label class="fld"><span>second line</span><input data-k="pay1b"></label></div>
         <div class="pay-row"><label class="fld"><span>Step 2 %</span><input type="number" min="0" max="100" data-k="pay2Pct"></label><label class="fld"><span>first line</span><input data-k="pay2a"></label><label class="fld"><span>second line</span><input data-k="pay2b"></label></div>
         <div class="pay-row"><label class="fld"><span>Step 3 %</span><input type="number" min="0" max="100" data-k="pay3Pct"></label><label class="fld"><span>first line</span><input data-k="pay3a"></label><label class="fld"><span>second line</span><input data-k="pay3b"></label></div>
-        <label class="fld"><span>Late fee per month (%)</span><input type="number" step="0.1" min="0" data-k="lateFeePct"></label>
         <label class="fld"><span>Payment options</span><input data-k="payModes" data-hist="payModes"></label>
         <div class="hint" data-hint="pay"></div>
       </div>
@@ -707,7 +706,7 @@ details.grp[open]>summary::after{content:"–"}
   <div class="tl white" style="--x:99;--y:350.5;--fs:9.9;--lh:13;--w:134" data-show="pay1On" data-max="385">Pay <span data-f="pay1Pct"></span>% <span data-f="pay1a"></span><br><span data-f="pay1b"></span></div>
   <div class="tl white" style="--x:99;--y:423;--fs:9.9;--lh:13;--w:134" data-show="pay2On" data-max="458">Pay <span data-f="pay2Pct"></span>% <span data-f="pay2a"></span><br><span data-f="pay2b"></span></div>
   <div class="tl white" style="--x:99;--y:495;--fs:9.9;--lh:13;--w:134" data-show="pay3On" data-max="530">Pay <span data-f="pay3Pct"></span>% <span data-f="pay3a"></span><br><span data-f="pay3b"></span></div>
-  <div class="tl white" style="--x:54;--y:552;--fs:7.9;--lh:19;--w:196" data-max="650">Late Payment: If your payment is late, a <span data-f="lateFeePct"></span>% monthly fee will apply until it’s paid.<br><span style="display:block;margin-top:calc(5*var(--pt))">Payment Options: You can pay through <span data-f="payModes"></span>.</span></div>
+  <div class="tl white" style="--x:54;--y:552;--fs:7.9;--lh:19;--w:196" data-max="650">Payment Options: You can pay through <span data-f="payModes"></span>.</div>
 
   <div class="t white" style="--x:116;--y:712;--fs:15.8">Warranty</div>
   <div class="a wlist" style="--x:216;--y:684" data-maxx="555" data-render="warranty"></div>
@@ -795,7 +794,7 @@ const PER_PROPOSAL_KEYS = [...CUSTOMER_KEYS, 'ksebRegistration']; // cleared by 
 // Warranty band on page 5. The panel row also feeds the cover and page 4; the battery row is hidden for on-grid.
 const DEFAULT_WARRANTY = [
   { kind: 'panel', label: 'Panels', years: '30' },
-  { kind: 'inverter', label: 'Inverter', years: '12' },
+  { kind: 'inverter', label: 'Inverter', years: '8' },
   { kind: 'battery', label: 'Battery', years: '10' }
 ];
 const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
@@ -803,7 +802,7 @@ const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
   .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
 
 const DEFAULTS = {
-  v: 5,
+  v: 6,
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
@@ -813,10 +812,10 @@ const DEFAULTS = {
   pay1Pct: 50, pay1a: 'upfront', pay1b: 'when you agree to start',
   pay2Pct: 30, pay2a: 'after we deliver', pay2b: 'the solar equipment',
   pay3Pct: 20, pay3a: 'after we’ve set up', pay3b: 'the solar power plant.',
-  lateFeePct: 1.5, payModes: 'NEFT, cheque or online',
+  payModes: 'NEFT, cheque or online',
   ksebFeasibility: '1,000', ksebRegistration: '', inspectorate: 'NIL',
   amcYears: 5, warranty: DEFAULT_WARRANTY,
-  statSavings: '70-100%', statProjects: '100+',
+  statSavings: '70-100%', statProjects: '200+',
   pb_waaree: true, pb_adani: true, pb_renewsys: false, pb_vikram: false, pb_tata: false, pb_premier: false,
   ib_waaree: true, ib_havells: true, ib_deye: true,
   showSign: true,
@@ -1026,6 +1025,11 @@ function migrate(saved) {
     Object.entries(DEFAULT_MANAGER_PHONES).forEach(([name, phone]) => { if (!String(s.mgrPhones[name] || '').trim()) s.mgrPhones[name] = phone; });
     const cur = String(s.projectManager || '').trim();
     if (cur && !String(s.managerPhone || '').trim()) s.managerPhone = s.mgrPhones[cur] || '';
+  }
+  if ((Number(s.v) || 1) < 6) {
+    if (String(s.statProjects).trim() === '100+') s.statProjects = '200+';
+    if (Array.isArray(s.warranty)) s.warranty = s.warranty.map(w => w && w.kind === 'inverter' && String(w.years).trim() === '12' ? { ...w, years: '8' } : w);
+    delete s.lateFeePct;
   }
   s.v = DEFAULTS.v;
   return s;
@@ -1932,7 +1936,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.25-1';
+const APP_VERSION = '2026.10.27-1';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;
