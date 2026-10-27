@@ -898,13 +898,22 @@ function demoBom(type, size) {
     r.component === 'AC Cable' ? { ...r, spec: big ? '6 sq.mm' : '4 sq.mm' } :
     /DC DB$/.test(r.component) ? { ...r, spec: `${big ? '2 In 2 Out' : '1 In 1 Out'}, IP65, SPD Protection` } : r);
 }
+// Packages taken from the client's own proposals; they replace the demo package of the same type and size.
+// 3 kW On-grid: from the proposal made for Fayis (FE26_0003).
+const CLIENT_PACKAGES = [{
+  type: 'On-grid', kw: 3,
+  values: { invKw: 3, phase: 'Single phase', invMake: 'Waaree / Havells / Deye', panelMake: 'Waaree', panelWatt: 570, panelCount: 6, panelTech: 'Dcr topcon',
+    batteryMake: 'Solinteg', batteryCount: 1, batterySpec: '102.4V, 50AH', systemCost: 220000 },
+  bom: demoBom('On-grid', 3).filter(r => r.component !== 'Walkway').map(r => r.component === 'Mounting Structure' ? { ...r, brand: 'Appolo GP' } : r)
+}];
 function demoPackages() {
   const common = { invMake: 'Waaree / Havells / Deye', panelMake: 'Waaree', panelWatt: 620, panelTech: 'Bifacial Mono-PERC Half Cut Cells (Non-DCR)', batteryMake: 'Solinteg', batterySpec: '102.4V, 50AH' };
-  return TYPES.flatMap(type => Object.entries(DEMO_SIZES).map(([size, d]) => ({
+  const demo = TYPES.flatMap(type => Object.entries(DEMO_SIZES).map(([size, d]) => ({
     type, kw: Number(size),
     values: { ...common, invKw: Number(size), phase: d.phase, panelCount: d.panelCount, batteryCount: d.batteryCount, systemCost: d.price[type] },
     bom: demoBom(type, Number(size))
   })));
+  return demo.map(p => { const c = CLIENT_PACKAGES.find(x => x.type === p.type && x.kw === p.kw); return c ? clone(c) : p; });
 }
 const normPackage = p => p && TYPES.includes(p.type) && Number(p.kw) > 0
   ? { type: p.type, kw: Number(p.kw), values: pickPkg(p.values || {}), bom: normBom(p.bom, p.type) } : null;
@@ -916,10 +925,15 @@ function loadPackages() {
   packages = sortPackages(Array.isArray(saved) ? saved.map(normPackage).filter(Boolean) : demoPackages());
   let upgraded = null;
   try { upgraded = localStorage.getItem(PKG_STORE + '-up'); } catch (e) { /* ignore */ }
-  if (Array.isArray(saved) && upgraded !== '5') {
+  if (Array.isArray(saved) && upgraded !== '6') {
     packages.forEach(p => { p.bom = normBom(upgradeRows(p.bom), p.type); });
+    CLIENT_PACKAGES.forEach(c => {
+      const i = packages.findIndex(p => p.type === c.type && p.kw === c.kw);
+      const v = i >= 0 ? packages[i].values : null;
+      if (v && Number(v.systemCost) === 195000 && Number(v.panelCount) === 5) packages[i] = normPackage(clone(c)); // still the old demo figures
+    });
     savePackages();
-    try { localStorage.setItem(PKG_STORE + '-up', '5'); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(PKG_STORE + '-up', '6'); } catch (e) { /* ignore */ }
   }
 }
 function savePackages() {
@@ -1936,7 +1950,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.27-1';
+const APP_VERSION = '2026.10.27-2';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;

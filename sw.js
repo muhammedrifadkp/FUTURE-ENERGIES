@@ -1,7 +1,7 @@
 // Offline support for the Future Energies Proposal Builder.
 // For every release raise VERSION here, APP_VERSION in index.html and version.json together;
 // installed apps then switch to the new version by themselves.
-const VERSION = '2026.10.27-1';
+const VERSION = '2026.10.27-2';
 const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
