@@ -55,6 +55,31 @@
   --sans:'Noto Sans','Segoe UI',system-ui,sans-serif;
   --kick:'Barlow','Bahnschrift','Segoe UI',sans-serif;
 }
+/* Pontis Energy: its own palette (slate navy, sky blue and sage, from the Pontis logo) and a geometric sans for
+   headings in place of the serif, so the two companies' proposals are told apart at a glance.
+   The SVG artwork follows in applyCompany() (colours in CO_COLOURS, files in assets/pontis/art/). */
+html[data-co="pontis"]{
+  --navy:#284C62; --navy-d:#17303F; --navy-x:#1D3B4F;
+  --lime:#2F86B8; --lime-2:#2F86B8; --olive:#7E9D57; --olive-2:#7E9D57;
+  --tint:#F1F6FA; --cream:#EEF4F8; --cream-2:#F3F7FA;
+  --lime-50:#E8F2F9; --lime-100:#C9E0F0; --navy-50:#E6EDF2;
+  --serif:'Barlow','Bahnschrift','Segoe UI',sans-serif;
+}
+html[data-co="pontis"] .page .serif,html[data-co="pontis"] .page em{font-style:normal!important}
+html[data-co="pontis"] .page h1.serif{letter-spacing:-.01em}
+html[data-co="pontis"] .page h1 em,html[data-co="pontis"] .page h2.green{color:var(--lime)}
+html[data-co="pontis"] .logo{width:calc(168*var(--pt))}
+html[data-co="pontis"] [data-edit="about"]{width:calc(282*var(--pt))!important}
+html[data-co="pontis"] .kick{letter-spacing:.22em}
+html[data-co="pontis"] .ccard{background:var(--navy)}
+html[data-co="pontis"] .csep{border-top-color:#5E86A0}
+html[data-co="pontis"] .c-badge{background:var(--lime)}
+html[data-co="pontis"] .c-circle{background:#EEF4F8}
+html[data-co="pontis"] .sign{border-color:#B9CCD9}
+html[data-co="pontis"] .sign h4{color:var(--navy)}
+html[data-co="pontis"] .oline{border-top-color:#C3D3DE}
+.co-foot{display:none}
+html[data-co="pontis"] .co-foot{display:block}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{margin:0}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%} /* stop iPhones enlarging the small proposal text */
@@ -72,7 +97,18 @@ body{font-family:var(--sans);color:var(--ui-ink);background:var(--desk);display:
 body.resizing{cursor:col-resize;user-select:none}
 body.resizing .preview{pointer-events:none}
 .ed-head{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
-.ed-head img{height:34px;display:block}
+.ed-head>img{height:34px;display:block}
+/* company switcher: two native radios styled as a segmented control */
+.co-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 14px;border:1px solid var(--line);border-radius:12px;background:var(--line-2)}
+.co-switch legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.co-opt{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 10px;border-radius:9px;cursor:pointer;font:600 12.5px/1.2 var(--sans);color:var(--ui-ink-2);transition:background-color .15s,color .15s,box-shadow .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.co-opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.co-opt img{width:24px;height:24px;object-fit:contain;flex:none}
+.co-opt:hover{color:var(--ui-ink)}
+/* classes set in applyCompany() and on focus: older iPhones (iOS 15) have no :has() */
+.co-opt.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(15,25,50,.14),0 0 0 1.5px var(--navy)}
+.co-opt.focus{outline:2px solid var(--lime);outline-offset:2px}
+.co-note{margin:0 0 4px;font-size:11.5px;color:var(--muted)}
 .ed-head h1{font:600 15px/1.3 var(--sans);margin:10px 0 2px}
 .ed-head p{margin:0;font-size:12px;color:var(--muted)}
 .ed-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -88,7 +124,14 @@ body.resizing .preview{pointer-events:none}
 .mem-tip{margin:8px 0 0;font-size:11.5px;line-height:1.45;color:#3D5714;background:var(--lime-50);border-radius:7px;padding:7px 9px}
 .btn.install{border-color:var(--navy);background:var(--navy-50);color:var(--navy);display:inline-flex;align-items:center;gap:5px}
 .btn.install:hover{border-color:var(--navy-d);color:var(--navy-d)}
-.print-tip[hidden],.btn[hidden]{display:none}
+.print-tip[hidden],.btn[hidden],.tips[hidden]{display:none}
+/* the tip boxes can be closed; they come back the next time the app is opened (sessionStorage) */
+.tips{position:relative}
+.tips .mem-tip{padding-right:34px}
+.tips-close{position:absolute;top:10px;right:2px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;border-radius:7px;background:transparent;color:var(--ui-ink-2);cursor:pointer;font-size:14px;touch-action:manipulation}
+.tips-close::before{content:"";position:absolute;inset:-8px} /* 44px touch target */
+.tips-close:hover{background:rgba(15,25,50,.08);color:var(--ui-ink)}
+.tips-close:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 /* PDF made in the browser: progress and "PDF ready" card (shown in the install-modal backdrop) */
 .pdf-card{background:#fff;border-radius:16px;padding:22px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 24px 50px rgba(10,20,45,.25);border:1px solid var(--line)}
 .pdf-card h3{font:600 16px/1.3 var(--sans);margin:0 0 6px;color:var(--ui-ink)}
@@ -282,6 +325,9 @@ details.grp[open]>summary::after{content:"–"}
 /* 6. contact */
 .ccard{background:var(--olive);color:#fff;border-radius:calc(12*var(--pt));padding:calc(39*var(--pt)) calc(12*var(--pt)) calc(18*var(--pt)) calc(19*var(--pt))}
 .ccard .ct{font-size:calc(17.8*var(--pt));line-height:1.2}
+.c-circle{border-radius:50%;background:#F8F7ED}
+.c-badge{background:#222121}
+.co-foot{color:#fff;font-size:calc(7.6*var(--pt));letter-spacing:.04em;white-space:nowrap}
 .csep{border-top:calc(.6*var(--pt)) solid #B5D865;margin:calc(10*var(--pt)) calc(18*var(--pt)) calc(10*var(--pt)) 0}
 .crow{display:grid;grid-template-columns:calc(26*var(--pt)) 1fr;column-gap:calc(9*var(--pt));align-items:start;font-size:calc(11.5*var(--pt));line-height:calc(18*var(--pt));margin-bottom:calc(7*var(--pt));overflow-wrap:break-word}
 .crow:last-child{margin-bottom:0}
@@ -336,7 +382,12 @@ details.grp[open]>summary::after{content:"–"}
 <aside class="editor" aria-label="Proposal details">
   <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="Resize the details panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
   <div class="ed-head">
-    <img src="assets/logo.png" alt="Future Energies">
+    <fieldset class="co-switch" id="coSwitch">
+      <legend>Company on the proposal</legend>
+      <label class="co-opt"><input type="radio" name="company" value="fe"><img src="icons/favicon-64.png" alt=""><span translate="no">Future Energies</span></label>
+      <label class="co-opt"><input type="radio" name="company" value="pontis"><img src="assets/pontis/icon.png" alt=""><span translate="no">Pontis Energy</span></label>
+    </fieldset>
+    <img src="assets/logo.png" alt="Future Energies" id="edLogo">
     <h1>Proposal builder</h1>
     <p>Fill in the details; the proposal updates as you type.</p>
     <div class="ed-actions">
@@ -351,9 +402,12 @@ details.grp[open]>summary::after{content:"–"}
         <span>Install app</span>
       </button>
     </div>
+    <div class="tips" id="tips">
+    <button class="tips-close" type="button" id="tipsClose" aria-label="Hide these tips until the app is opened again" title="Hide tips (they come back next time you open the app)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <p class="mem-tip">Everything except the customer details and the registration fee is remembered on this device and filled in again next time. <b>New proposal</b> clears only those and moves the project ID up by one.</p>
     <p class="print-tip"><b>Download PDF</b> makes an exact A4 file on any phone or computer. On a phone it opens the share menu, so you can send it straight to WhatsApp or save it to Files.</p>
     <p class="print-tip" id="printTip"><b>Print</b> is for paper. In the print window set <b>Margins: None</b> and untick <b>Headers and footers</b>.</p>
+    </div>
   </div>
   <div class="ed-scroll">
     <div class="warnings" id="warnings"></div>
@@ -487,6 +541,7 @@ details.grp[open]>summary::after{content:"–"}
 
     <details class="grp"><summary>Company &amp; bank details</summary>
       <div class="grid2">
+        <p class="hint">These are the details of <b data-co-name></b>. Each company keeps its own details, project ID and bank account; switch company at the top.</p>
         <label class="fld chk full"><input type="checkbox" data-k="showSign">Customer acceptance &amp; signature box at the bottom of page 6</label>
         <label class="fld"><span>Phone 1</span><input data-k="coPhone1"></label>
         <label class="fld"><span>Phone 2</span><input data-k="coPhone2"></label>
@@ -521,7 +576,8 @@ details.grp[open]>summary::after{content:"–"}
 <section class="page">
   <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
     <defs><clipPath id="clipCover"><path d="M564 372.8C532.3 387.7 522.5 377.7 522.5 377.7C474.1 357 433.4 389 433.4 389L133.6 550C77.2 570.8 79.4 613.9 79.4 613.9L79.4 680.8L595.3 680.8L595.3 358Z"/></clipPath></defs>
-    <image href="assets/art/p1-deco.svg" x="395" y="0" width="200.3" height="408"/>
+    <image href="assets/art/p1-deco.svg" x="395" y="0" width="200.3" height="408" data-co="fe"/>
+    <g data-co="pontis"><path d="M318 0H595.3V262C566 214 527 182 474 160C410 133 352 86 318 0Z" fill="#EEF4F8"/><path d="M432 0H595.3V158C570 120 538 96 500 76C470 60 446 34 432 0Z" fill="#DCEAF4"/><path d="M360 0C392 84 448 124 505 148C548 166 576 192 595.3 222" fill="none" stroke="#7E9D57" stroke-width="1.2"/></g>
     <image href="assets/art/p1-tri.svg" x="0" y="470" width="142" height="214"/>
     <image href="assets/photo.jpg" x="79" y="288" width="517" height="517" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipCover)"/>
     <image href="assets/art/p1-stats.svg" x="60" y="700" width="480" height="78"/>
@@ -530,7 +586,7 @@ details.grp[open]>summary::after{content:"–"}
   </svg>
   <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:51">
   <div class="t kick" style="--x:92;--y:203;--fs:13">Solar Energy Proposal</div>
-  <h1 class="tl serif b6" style="--x:42;--y:254;--fs:48;--lh:49;--w:420">Future Energy,<br><em class="green">Bright</em> Energy.</h1>
+  <h1 class="tl serif b6" style="--x:42;--y:254;--fs:48;--lh:49;--w:420" data-cotext="coverHead">Future Energy,<br><em class="green">Bright</em> Energy.</h1>
   <p class="tl serif" style="--x:40;--y:384.5;--fs:14;--lh:20;--w:260;font-style:italic">A tailored solar transition plan -<br>engineered for efficiency, built for<br>scale, designed to last.</p>
   <div class="t serif" style="--x:123;--y:733;--fs:24" data-f="statSavings"></div>
   <div class="tl stat-lbl" style="--x:124;--y:750;--fs:9;--lh:15;--w:100">Average Energy<br>Savings</div>
@@ -544,7 +600,7 @@ details.grp[open]>summary::after{content:"–"}
 <section class="page">
   <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
     <defs><clipPath id="clipAbout"><path d="M391.2 265.1C332.2 327.9 336.1 363.7 336.1 363.7L336.1 491L595.3 491L595.3 59.7C541.9 100.6 391.2 265.1 391.2 265.1Z"/></clipPath></defs>
-    <image href="assets/art/p2-deco.svg" x="340" y="0" width="255.3" height="322"/>
+    <image href="assets/art/p2-deco.svg" x="340" y="0" width="255.3" height="322" data-co="fe"/>
     <image href="assets/photo.jpg" x="186" y="59" width="434" height="433" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipAbout)"/>
     <line x1="38" y1="164.3" x2="65" y2="164.3" stroke="#83A94D" stroke-width="1"/>
     <line x1="44" y1="491" x2="539" y2="491" stroke="#83A94D" stroke-width=".5"/>
@@ -553,7 +609,7 @@ details.grp[open]>summary::after{content:"–"}
   <div class="t kick" style="--x:78;--y:162.5;--fs:14;font-weight:600;color:var(--olive-2)">About the company</div>
   <div class="tl serif" style="--x:40;--y:232.5;--fs:13;--lh:21;--w:307;font-style:italic" data-edit="about" contenteditable="true" spellcheck="false" data-max="480">Future Energies is a trusted solar energy company committed to delivering reliable, efficient, and sustainable solar solutions across Kerala. We provide end-to-end services, including consultation, system design, supply, installation, approvals, and after-sales support. With a focus on quality, innovation, and customer satisfaction, we ensure every project is completed to the highest standards, helping our customers achieve long-term energy savings and a greener future.</div>
   <h2 class="t serif" style="--x:40;--y:530.5;--fs:21">Trusted Brands We Work With</h2>
-  <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, Future Energies partners with India’s most<br>trusted and reputed solar brands</p>
+  <p class="tl" style="--x:41;--y:566;--fs:10;--lh:14;--w:500">To ensure superior performance and long-term reliability, <span data-f="coName"></span> partners with India’s most<br>trusted and reputed solar brands</p>
   <div class="t serif" style="--x:63;--y:626;--fs:12.5">Panels</div>
   <div class="a brands" style="--x:63;--y:635;--w:468" data-max="700">
     <div class="brand" data-show="pb_waaree"><img src="assets/brands/waaree.png" alt="Waaree" style="width:calc(78*var(--pt))"></div>
@@ -616,7 +672,7 @@ details.grp[open]>summary::after{content:"–"}
   <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
     <defs><clipPath id="clipSystem"><path d="M558.3 0C558.3 0 472 23.6 434.2 97.2C434.2 97.2 402.5 137 412.8 198.8C412.8 198.8 428.1 268.7 490.4 278.4C490.4 278.4 557.8 292.5 595.3 259.9L595.3 0Z"/></clipPath></defs>
     <image href="assets/photo.jpg" x="308" y="-5" width="288" height="287" preserveAspectRatio="xMidYMid slice" clip-path="url(#clipSystem)"/>
-    <image href="assets/art/p4-leaf.svg" x="360" y="0" width="120" height="256"/>
+    <image href="assets/art/p4-leaf.svg" x="360" y="0" width="120" height="256" data-co="fe"/>
     <image href="assets/art/p4-panel.svg" x="470" y="298" width="125.3" height="230"/>
     <line x1="44" y1="106" x2="70" y2="106" stroke="#98C93E" stroke-width="1"/>
     <image href="assets/art/feat-sun.svg" x="63" y="729" width="41" height="41"/>
@@ -651,7 +707,8 @@ details.grp[open]>summary::after{content:"–"}
 <!-- ========== 5. PAYMENT TERMS & GENERAL T&C ========== -->
 <section class="page">
   <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
-    <image href="assets/art/p5-sprig.svg" x="478" y="0" width="117.3" height="280"/>
+    <image href="assets/art/p5-sprig.svg" x="478" y="0" width="117.3" height="280" data-co="fe"/>
+    <g data-co="pontis"><path d="M420 0H595.3V200C566 162 530 140 498 118C462 94 432 50 420 0Z" fill="#EEF4F8"/><path d="M432 0H595.3V158C570 120 538 96 500 76C470 60 446 34 432 0Z" fill="#DCEAF4"/><path d="M452 0C470 58 500 92 534 114C562 132 582 150 595.3 170" fill="none" stroke="#7E9D57" stroke-width="1.2"/></g>
     <line x1="39" y1="109.5" x2="65" y2="109.5" stroke="#98C93E" stroke-width="1"/>
     <rect x="39" y="253" width="221" height="402" rx="12" fill="#10223F"/>
     <g fill="none" stroke="#A97C50" stroke-width=".5">
@@ -716,14 +773,16 @@ details.grp[open]>summary::after{content:"–"}
 <section class="page">
   <svg class="art" viewBox="0 0 595.28 841.89" aria-hidden="true">
     <line x1="41" y1="143.7" x2="68" y2="143.7" stroke="#98C93E" stroke-width="2"/>
-    <image href="assets/art/p6-right.svg" x="470" y="110" width="125.3" height="455"/>
-    <image href="assets/art/p6-dot.svg" x="343" y="556" width="35" height="36"/>
+    <image href="assets/art/p6-right.svg" x="470" y="110" width="125.3" height="455" data-co="fe"/>
+    <g data-co="pontis"><path d="M318 0H595.3V262C566 214 527 182 474 160C410 133 352 86 318 0Z" fill="#EEF4F8"/><path d="M432 0H595.3V158C570 120 538 96 500 76C470 60 446 34 432 0Z" fill="#DCEAF4"/><path d="M360 0C392 84 448 124 505 148C548 166 576 192 595.3 222" fill="none" stroke="#7E9D57" stroke-width="1.2"/></g>
+    <image href="assets/art/p6-dot.svg" x="343" y="556" width="35" height="36" data-co="fe"/>
+    <image href="assets/pontis/icon.png" x="356" y="440" width="190" height="170" opacity=".07" data-co="pontis"/>
     <image href="assets/art/p6-bottom.svg" x="45" y="655" width="505" height="140" data-show="noSign"/>
     <line x1="328" y1="221.7" x2="511" y2="221.7" stroke="#72923C" stroke-width=".75"/>
   </svg>
   <img class="logo" src="assets/logo.png" alt="Future Energies" style="--y:35">
   <div class="t kick" style="--x:76;--y:143;--fs:11.4">Let’s Connect</div>
-  <h1 class="tl serif b6" style="--x:41;--y:194.5;--fs:33;--lh:37;--w:280">Let’s build<br><em class="green">future</em> together.</h1>
+  <h1 class="tl serif b6" style="--x:41;--y:194.5;--fs:33;--lh:37;--w:280" data-cotext="p6Head">Let’s build<br><em class="green">future</em> together.</h1>
   <p class="tl" style="--x:45;--y:270;--fs:14;--lh:20;--w:275">We’re here to power your tomorrow<br>with clean, reliable and sustainable<br>energy solutions.</p>
 
   <div class="t olive" style="--x:327;--y:168;--fs:13.8">GST No:</div>
@@ -739,7 +798,7 @@ details.grp[open]>summary::after{content:"–"}
   </div>
 
   <div class="a ccard" style="--x:42;--y:403;--w:254" data-max="702" data-max-sign="680">
-    <div class="ct">Future Energies</div>
+    <div class="ct" data-f="coName"></div>
     <div class="csep"></div>
     <div class="crow"><img src="assets/art/ic-pin.svg" alt="" style="width:calc(22*var(--pt))"><div class="pre" data-f="coAddress"></div></div>
     <div class="csep"></div>
@@ -748,9 +807,9 @@ details.grp[open]>summary::after{content:"–"}
     <div class="crow" data-show="hasCoInsta"><img src="assets/art/ic-insta-white.svg" alt="" style="width:calc(20*var(--pt))"><div data-f="instaT"></div></div>
   </div>
   <!-- on top of the card, so these are page elements (each page keeps a single artwork layer underneath) -->
-  <div class="a" style="--x:52;--y:372;--w:59;height:calc(64*var(--pt));border-radius:50%;background:#F8F7ED"></div>
+  <div class="a c-circle" style="--x:52;--y:372;--w:59;height:calc(64*var(--pt))"></div>
   <img class="a" src="assets/art/ic-phone-big.svg" alt="" style="--x:62;--y:385;--w:40">
-  <div class="a" style="--x:130;--y:393;--w:107;height:calc(32*var(--pt));background:#222121"></div>
+  <div class="a c-badge" style="--x:130;--y:393;--w:107;height:calc(32*var(--pt))"></div>
   <div class="t white tc" style="--x:183.5;--y:409;--fs:13.8">Contact Us</div>
   <!-- replaces the line drawing at the bottom when shown -->
   <div class="a sign" style="--x:42;--y:684;--w:511" data-show="showSign" data-max="790">
@@ -801,8 +860,56 @@ const normWarranty = list => (Array.isArray(list) ? list : DEFAULT_WARRANTY)
   .filter(w => w && typeof w === 'object')
   .map(w => ({ kind: ['panel', 'inverter', 'battery'].includes(w.kind) ? w.kind : 'item', label: String(w.label ?? ''), years: String(w.years ?? '') }));
 
+// ---------- Companies: the same proposal can go out as Future Energies or as Pontis Energy ----------
+// Switching keeps the customer, system, bill of materials and price; the company's own details below
+// (CO_KEYS) are kept separately for each company, and the proposal takes that company's logo, colours and design.
+const CO_KEYS = ['projectId', 'preparedBy', 'statProjects', 'coPhone1', 'coPhone2', 'coEmail', 'coInsta', 'coAddress',
+  'gstNo', 'bankName', 'bankBranch', 'bankAcc', 'bankIfsc', 'bankAccName', 'bankUpi'];
+const CO = {
+  fe: {
+    name: 'Future Energies', short: 'FE', logo: 'assets/logo.png', themeColor: '#223A73',
+    defaults: {
+      projectId: 'FE26_0001', preparedBy: 'Future Energies', statProjects: '200+',
+      coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
+      coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
+      gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
+      bankAccName: '', bankUpi: ''
+    },
+    texts: {} // the wording written in the page markup
+  },
+  pontis: {
+    name: 'Pontis Energy', short: 'PE', logo: 'assets/pontis/logo.png', themeColor: '#284C62',
+    defaults: {
+      projectId: 'PE26_0001', preparedBy: 'Pontis Energy', statProjects: '200+',
+      coPhone1: '+91 85938 88899', coPhone2: '+91 75511 00200', coEmail: 'pontisenergy@gmail.com', coInsta: '@pontis.energy',
+      coAddress: 'Muttungal, Near Chorode Gate,\nVadakara, Kozhikode,\nKerala - 673106',
+      gstNo: '32ABFFP9224M1ZY', bankName: 'Federal Bank', bankBranch: 'Vadakara', bankAcc: '10710200017400', bankIfsc: 'FDRL0001071',
+      bankAccName: 'Pontis Energy', bankUpi: ''
+    },
+    texts: {
+      coverHead: 'Your bridge to<br><em class="green">clean</em> energy.',
+      p6Head: 'Let’s power a<br><em class="green">brighter</em> tomorrow.',
+      about: 'Pontis Energy is a solar energy company that bridges homes and businesses across Kerala to clean, dependable power. We take care of every step, from site survey and system design to supply, installation, KSEB approvals and after-sales service. Quality components, careful engineering and a responsive local team mean every system we build keeps delivering savings for years, for a cleaner and brighter future.',
+      signHead2: 'For Pontis Energy'
+    }
+  }
+};
+// text edited on the page that names the company is kept per company (Future Energies keeps the original keys)
+const CO_EDIT_KEYS = ['about', 'signHead2'];
+// Pontis colours for the artwork drawn in the page markup (the artwork files have copies in assets/pontis/art/)
+const CO_COLOURS = {
+  '#98C93E': '#2F86B8', '#98C940': '#2F86B8', '#8DC63F': '#2F86B8', '#8CB23F': '#7E9D57', '#8CB23E': '#7E9D57', '#83A94D': '#7E9D57',
+  '#72923C': '#6F8F4C', '#BEDB8A': '#A9CDE6', '#F7F9F2': '#F1F6FA', '#F4F9EA': '#EAF3F9', '#F1F8E5': '#E8F2F9', '#F8F7ED': '#EEF4F8',
+  '#FBF8F3': '#F3F7FA', '#10223F': '#1D3B4F', '#102340': '#1D3B4F', '#A97C50': '#8FB3CB', '#E0E0D1': '#D3DFE8'
+};
+const PONTIS_ART = ['feat-sun', 'ic-amc-check', 'ic-amc-search', 'ic-amc-shield2', 'ic-amc-truck', 'ic-bulb', 'ic-calendar', 'ic-chart',
+  'ic-clipboard', 'ic-doc', 'ic-hourglass', 'ic-idcard', 'ic-mail', 'ic-notes', 'ic-panel', 'ic-person', 'ic-phone', 'ic-phone-big',
+  'ic-pin-green', 'ic-truck', 'ic-user', 'ic-useradd', 'p1-deco', 'p1-stats', 'p1-tri', 'p2-deco', 'p3-bottom', 'p3-top', 'p4-leaf',
+  'p5-sprig', 'p6-bottom', 'p6-dot', 'p6-right'];
+
 const DEFAULTS = {
-  v: 7,
+  v: 8,
+  company: 'fe', coSaved: {},
   custName: 'Mr. Client Name', custAddress: 'Address line, City', custPhone: '+91 90000 00000',
   projectId: 'FE26_0001', date: todayISO(), dateText: '', preparedBy: 'Future Energies', projectManager: '', projectName: '', validDays: 15,
   systemType: 'Hybrid', invKw: 10, phase: 'Three phase', invMake: 'Waaree / Havells / Deye',
@@ -821,10 +928,7 @@ const DEFAULTS = {
   showSign: true,
   packageId: '',
   managerPhone: '', mgrName: '', mgrPhones: {},
-  coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
-  coAddress: 'Opp. Union Bank,\nThiruvallur, Vadakara,\nCalicut - 673541',
-  gstNo: '32AKVPF5101E2ZK', bankName: 'Canara Bank', bankBranch: 'Vadakara', bankAcc: '120037773140', bankIfsc: 'CNRB0002354',
-  bankAccName: '', bankUpi: ''
+  ...CO.fe.defaults
 };
 
 // Bill of materials, one list per system type. Rows of kind panel / inverter / battery / meter / netmeter
@@ -1068,6 +1172,8 @@ function migrate(saved) {
 function fromSaved(saved) {
   const s = { ...DEFAULTS, ...migrate(saved) };
   if (!TYPES.includes(s.systemType)) s.systemType = DEFAULTS.systemType;
+  if (!CO[s.company]) s.company = 'fe';
+  s.coSaved = s.coSaved && typeof s.coSaved === 'object' ? s.coSaved : {};
   s.boms = normBoms(s.boms);
   s.warranty = normWarranty(s.warranty);
   if (!s.mgrName) s.mgrName = String(s.projectManager || '').trim();
@@ -1150,6 +1256,10 @@ function derive(s) {
   v.dateT = String(s.dateText).trim() ? s.dateText : fmtDate(d); // text typed on page 3 wins over the date picker
 
   // Company
+  const co = CO[s.company] || CO.fe;
+  v.coName = co.name;
+  v.footT = [co.name.toUpperCase(), String(s.coAddress).split('\n').map(x => x.trim().replace(/,$/, '')).filter(Boolean).join(', '),
+    [s.coPhone1, s.coPhone2].map(x => String(x).trim()).filter(Boolean).join(' / ')].filter(Boolean).join('   ·   '); // email is on page 6
   v.coPhones = [s.coPhone1, s.coPhone2].map(x => String(x).trim()).filter(Boolean).join('\n');
   v.hasCoPhone = !!v.coPhones;
   v.hasCoEmail = !!String(s.coEmail).trim();
@@ -1283,9 +1393,51 @@ function fillForm() {
     if (el.type === 'checkbox') el.checked = !!val; else el.value = val ?? '';
   });
 }
+const editKey = k => CO_EDIT_KEYS.includes(k) && state.company !== 'fe' ? `${k}@${state.company}` : k;
+const origText = k => (state.company !== 'fe' && CO[state.company].texts[k]) || original[k];
 function applyEdits() {
-  $$('[data-edit]').forEach(el => { el.innerHTML = edits[el.dataset.edit] ?? original[el.dataset.edit]; });
+  $$('[data-edit]').forEach(el => { el.innerHTML = edits[editKey(el.dataset.edit)] ?? origText(el.dataset.edit); });
 }
+
+// Puts the chosen company's logo, colours, artwork and wording on the pages and in the app
+function applyCompany() {
+  const c = CO[state.company] ? state.company : 'fe', co = CO[c], pontis = c === 'pontis';
+  document.documentElement.dataset.co = c;
+  $$('.page img.logo, #edLogo').forEach(img => { img.src = co.logo; img.alt = co.name; });
+  $$('[data-co]').forEach(el => { el.style.display = el.dataset.co === c ? '' : 'none'; });
+  $$('[data-cotext]').forEach(el => { el.innerHTML = co.texts[el.dataset.cotext] ?? CO.fe.texts[el.dataset.cotext]; });
+  $$('[data-co-name]').forEach(el => { el.textContent = co.name; });
+  // artwork files: Pontis has recoloured copies
+  $$('.page svg.art image, .page img').forEach(im => {
+    const attr = im.tagName.toLowerCase() === 'img' ? 'src' : 'href';
+    if (im.dataset.orig === undefined) im.dataset.orig = im.getAttribute(attr) || '';
+    const m = im.dataset.orig.match(/^assets\/art\/([\w-]+)\.svg$/);
+    if (m) im.setAttribute(attr, pontis && PONTIS_ART.includes(m[1]) ? `assets/pontis/art/${m[1]}.svg` : im.dataset.orig);
+  });
+  // colours written in the page artwork (the PDF draws this layer on its own, so they must be real colours)
+  $$('.page svg.art [fill], .page svg.art [stroke]').forEach(el => {
+    ['fill', 'stroke'].forEach(a => {
+      if (!el.hasAttribute(a)) return;
+      const key = 'o' + a;
+      if (el.dataset[key] === undefined) el.dataset[key] = el.getAttribute(a);
+      const orig = el.dataset[key];
+      el.setAttribute(a, pontis ? (CO_COLOURS[orig.toUpperCase()] || orig) : orig);
+    });
+  });
+  $$('#coSwitch input').forEach(r => { r.checked = r.value === c; r.parentElement.classList.toggle('on', r.checked); });
+  const meta = $('meta[name="theme-color"]'); if (meta) meta.content = co.themeColor;
+  document.title = `${co.name} Proposal Builder`;
+}
+function switchCompany(c) {
+  if (!CO[c] || c === state.company) return;
+  state.coSaved[state.company] = Object.fromEntries(CO_KEYS.map(k => [k, state[k]]));
+  Object.assign(state, CO[c].defaults, state.coSaved[c] || {});
+  state.company = c;
+  applyCompany(); fillForm(); applyEdits(); update(); save();
+}
+$('#coSwitch').addEventListener('change', e => { if (e.target.name === 'company') switchCompany(e.target.value); });
+$('#coSwitch').addEventListener('keyup', e => { if (e.target.name === 'company') e.target.parentElement.classList.add('focus'); });
+$('#coSwitch').addEventListener('focusout', e => { e.target.parentElement.classList.toggle('focus', false); });
 
 function onField(e) {
   const el = e.target;
@@ -1349,7 +1501,7 @@ document.addEventListener('input', e => {
   const bd = e.target.closest && e.target.closest('[data-bind]');
   if (bd) { bd.dataset.typed = '1'; syncBound(bd, false); return; }
   const ed = e.target.closest && e.target.closest('[data-edit]');
-  if (ed) { edits[ed.dataset.edit] = ed.innerHTML; save(); update(); return; }
+  if (ed) { edits[editKey(ed.dataset.edit)] = ed.innerHTML; save(); update(); return; }
   const bf = e.target.dataset && e.target.dataset.bf;
   if (bf) {
     const r = bom()[+e.target.closest('.bom-row').dataset.i];
@@ -1563,7 +1715,7 @@ resizer.addEventListener('keydown', e => {
 
 function getPdfFileName() {
   const v = derive(state);
-  const name = String(state.custName || '').trim() || 'Future Energies Proposal';
+  const name = String(state.custName || '').trim() || `${CO[state.company].name} Proposal`;
   const sys = v.kwT && v.kwT !== '0' ? `${v.kwT}kW ${state.systemType}` : '';
   const id = String(state.projectId || '').trim();
   return [name, sys, id].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, '-');
@@ -1617,7 +1769,7 @@ function makePdf(images, title) {
   push('%PDF-1.4\n%âãÏÓ\n');
   obj(1, () => push('<< /Type /Catalog /Pages 2 0 R >>'));
   obj(2, () => push(`<< /Type /Pages /Count ${images.length} /Kids [${images.map((_, i) => `${first + i * 3} 0 R`).join(' ')}] >>`));
-  obj(3, () => push(`<< /Title ${text(title)} /Producer ${text('Future Energies Proposal Builder')} >>`));
+  obj(3, () => push(`<< /Title ${text(title)} /Producer ${text(`${CO[state.company].name} Proposal Builder`)} >>`));
   images.forEach((im, i) => {
     const p = first + i * 3;
     const draw = `q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q`;
@@ -1761,6 +1913,15 @@ const safariPrint = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacInt
   (/Safari\//.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Android)/.test(ua));
 if (safariPrint) { $('#btnPrint').hidden = true; $('#printTip').hidden = true; }
 
+// Tip boxes: closing hides them until the app is opened again (only the tips; real warnings always show)
+const TIPS_KEY = 'fe-tips-hidden';
+try { if (sessionStorage.getItem(TIPS_KEY) === '1') $('#tips').hidden = true; } catch (e) { /* ignore */ }
+$('#tipsClose').addEventListener('click', () => {
+  $('#tips').hidden = true;
+  try { sessionStorage.setItem(TIPS_KEY, '1'); } catch (e) { /* ignore */ }
+  $('#btnPdf').focus(); // focus goes to the next useful control, not lost
+});
+
 // ---------- Required fields: shown in red when PDF / print / save is tried without them ----------
 const REQUIRED = [['custName'], ['custAddress'], ['custPhone'], ['projectId'], ['date'], ['projectManager'], ['managerPhone'],
   ['invKw', true], ['panelCount', true], ['panelWatt', true], ['systemCost', true], ['ksebRegistration']];
@@ -1839,8 +2000,8 @@ $('#fileImport').addEventListener('change', async e => {
     if (!data || data.app !== 'fe-proposal' || typeof data.state !== 'object') throw new Error('bad file');
     state = fromSaved(data.state);
     edits = data.edits && typeof data.edits === 'object' ? data.edits : {};
-    fillForm(); renderBomEditor(); renderWarrantyEditor(); applyEdits(); update(); save();
-  } catch (err) { alert('That file is not a Future Energies proposal file.'); }
+    applyCompany(); fillForm(); renderBomEditor(); renderWarrantyEditor(); applyEdits(); update(); save();
+  } catch (err) { alert('That file is not a proposal file from this app.'); }
   e.target.value = '';
 });
 $('#btnResetText').addEventListener('click', e => {
@@ -1851,9 +2012,16 @@ $('#btnResetText').addEventListener('click', e => {
 
 // Init
 $$('[data-edit]').forEach(el => { original[el.dataset.edit] = el.innerHTML; });
+$$('[data-cotext]').forEach(el => { CO.fe.texts[el.dataset.cotext] = el.innerHTML; });
+// Pontis letterhead footer: a wave band like the one in its logo, with the company's details, on every page
+$$('.page').forEach(pg => {
+  pg.querySelector('svg.art').insertAdjacentHTML('beforeend', '<g data-co="pontis"><path d="M0 808C110 798 214 822 334 812C436 804 522 800 595.3 808V841.9H0Z" fill="#7E9D57"/><path d="M0 815C122 805 232 828 352 819C452 811 532 810 595.3 816V841.9H0Z" fill="#284C62"/></g>');
+  pg.insertAdjacentHTML('beforeend', '<div class="t co-foot tc" style="--x:297.6;--y:830;--fs:7.4" data-f="footT"></div>');
+});
 loadPackages();
 if (!load()) { const first = packages.find(p => pkgId(p) === DEFAULT_PACKAGE); if (first) fillFromPackage(first); } // a new device starts from a package
 wireDatalists();
+applyCompany();
 fillForm();
 renderBomEditor();
 renderWarrantyEditor();
@@ -1967,7 +2135,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.10.27-3';
+const APP_VERSION = '2026.11.15-1';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;

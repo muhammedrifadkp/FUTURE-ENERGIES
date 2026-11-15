@@ -1,7 +1,7 @@
 // Offline support for the Future Energies Proposal Builder.
 // For every release raise VERSION here, APP_VERSION in index.html and version.json together;
 // installed apps then switch to the new version by themselves.
-const VERSION = '2026.10.27-3';
+const VERSION = '2026.11.15-1';
 const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
@@ -12,6 +12,10 @@ const ART = [
   'ic-amc-shield', 'ic-amc-check', 'ic-amc-shield2', 'ic-amc-search', 'ic-amc-truck', 'ic-warranty',
   'ic-phone-big', 'ic-pin', 'ic-pin-green', 'ic-mail-white', 'ic-phone-white', 'ic-insta-white'
 ];
+const PONTIS_ART = ['feat-sun', 'ic-amc-check', 'ic-amc-search', 'ic-amc-shield2', 'ic-amc-truck', 'ic-bulb', 'ic-calendar', 'ic-chart',
+  'ic-clipboard', 'ic-doc', 'ic-hourglass', 'ic-idcard', 'ic-mail', 'ic-notes', 'ic-panel', 'ic-person', 'ic-phone', 'ic-phone-big',
+  'ic-pin-green', 'ic-truck', 'ic-user', 'ic-useradd', 'p1-deco', 'p1-stats', 'p1-tri', 'p2-deco', 'p3-bottom', 'p3-top', 'p4-leaf',
+  'p5-sprig', 'p6-bottom', 'p6-dot', 'p6-right'];
 const FILES = [
   './',
   'index.html',
@@ -21,6 +25,10 @@ const FILES = [
   'assets/vendor/html2canvas.min.js',
   ...['waaree.png', 'havells.png', 'deye.png', 'adani.png', 'renewsys.png', 'vikram.png', 'tata-power.png', 'premier.png'].map(b => `assets/brands/${b}`),
   ...ART.map(a => `assets/art/${a}.svg`),
+  // Pontis Energy: logo, icon and the recoloured artwork
+  'assets/pontis/logo.png',
+  'assets/pontis/icon.png',
+  ...PONTIS_ART.map(a => `assets/pontis/art/${a}.svg`),
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/icon-maskable-512.png',
