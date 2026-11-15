@@ -867,7 +867,7 @@ const CO_KEYS = ['projectId', 'preparedBy', 'statProjects', 'coPhone1', 'coPhone
   'gstNo', 'bankName', 'bankBranch', 'bankAcc', 'bankIfsc', 'bankAccName', 'bankUpi'];
 const CO = {
   fe: {
-    name: 'Future Energies', short: 'FE', logo: 'assets/logo.png', themeColor: '#223A73',
+    name: 'Future Energies', short: 'FE', logo: 'assets/logo.png', photo: 'assets/photo.jpg', themeColor: '#223A73',
     defaults: {
       projectId: 'FE26_0001', preparedBy: 'Future Energies', statProjects: '200+',
       coPhone1: '+91 62359 99005', coPhone2: '+91 62359 99006', coEmail: 'futuresolarenergy05@gmail.com', coInsta: '@futureenergies',
@@ -878,7 +878,8 @@ const CO = {
     texts: {} // the wording written in the page markup
   },
   pontis: {
-    name: 'Pontis Energy', short: 'PE', logo: 'assets/pontis/logo.png', themeColor: '#284C62',
+    // photo: free Unsplash photo https://unsplash.com/photos/blue-solar-panel-WvusC5M-TM8, cropped square
+    name: 'Pontis Energy', short: 'PE', logo: 'assets/pontis/logo.png', photo: 'assets/pontis/photo.jpg', themeColor: '#284C62',
     defaults: {
       projectId: 'PE26_0001', preparedBy: 'Pontis Energy', statProjects: '200+',
       coPhone1: '+91 85938 88899', coPhone2: '+91 75511 00200', coEmail: 'pontisenergy@gmail.com', coInsta: '@pontis.energy',
@@ -1413,6 +1414,7 @@ function applyCompany() {
     if (im.dataset.orig === undefined) im.dataset.orig = im.getAttribute(attr) || '';
     const m = im.dataset.orig.match(/^assets\/art\/([\w-]+)\.svg$/);
     if (m) im.setAttribute(attr, pontis && PONTIS_ART.includes(m[1]) ? `assets/pontis/art/${m[1]}.svg` : im.dataset.orig);
+    if (im.dataset.orig === 'assets/photo.jpg') im.setAttribute(attr, co.photo); // each company has its own solar photo
   });
   // colours written in the page artwork (the PDF draws this layer on its own, so they must be real colours)
   $$('.page svg.art [fill], .page svg.art [stroke]').forEach(el => {
@@ -2135,7 +2137,7 @@ window.addEventListener('keydown', e => { if (e.key === 'Escape') closeInstallMo
 
 // ---------- Updates: an installed app checks for a new version and switches to it ----------
 // For every release raise APP_VERSION here, VERSION in sw.js and version.json together.
-const APP_VERSION = '2026.11.15-1';
+const APP_VERSION = '2026.11.15-2';
 const TRIED_KEY = 'fe-update-tried';
 $('#appVersion').textContent = APP_VERSION;
 let newVersion = '', lastCheck = 0, updating = false;

@@ -1,7 +1,7 @@
 // Offline support for the Future Energies Proposal Builder.
 // For every release raise VERSION here, APP_VERSION in index.html and version.json together;
 // installed apps then switch to the new version by themselves.
-const VERSION = '2026.11.15-1';
+const VERSION = '2026.11.15-2';
 const CACHE = `fe-proposals-${VERSION}`;
 
 const ART = [
@@ -28,6 +28,7 @@ const FILES = [
   // Pontis Energy: logo, icon and the recoloured artwork
   'assets/pontis/logo.png',
   'assets/pontis/icon.png',
+  'assets/pontis/photo.jpg',
   ...PONTIS_ART.map(a => `assets/pontis/art/${a}.svg`),
   'icons/icon-192.png',
   'icons/icon-512.png',
